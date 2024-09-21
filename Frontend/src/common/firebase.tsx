@@ -4,8 +4,18 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyCVPtOzK_hTmOADGMKfato2W5tRfVphd9w",
+    authDomain: "blog-app-dd1ff.firebaseapp.com",
+    projectId: "blog-app-dd1ff",
+    storageBucket: "blog-app-dd1ff.appspot.com",
+    messagingSenderId: "193639479919",
+    appId: "1:193639479919:web:8a8dd91f62844bcb552b9a"
+};
+
 // Initialize Firebase
-const app = initializeApp(import.meta.env.VITE_firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
 // google auth
 
