@@ -9,6 +9,7 @@ import { nanoid } from 'nanoid'
 import * as admin from 'firebase-admin'
 import * as serviceAccount from '../../blog-app-dd1ff-firebase-adminsdk-zulwp-181549e0ad.json'
 import aws from "aws-sdk";
+import Blog from "../Schemas/Blog";
 
 dotenv.config()
 
@@ -262,6 +263,92 @@ router.get('/getuser', GetUserMiddleware, async (req: Request, res: Response) =>
     }
     catch (e) {
         res.status(401).json({ message: "error happened", error: e })
+    }
+})
+
+router.get("/latest-blogs", (req: Request, res: Response) => {
+    let maxLimit = 5;
+
+    Blog.find({ draft: false })
+        .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+        .sort({ publishedAt: -1 })
+        .select("blog_id title des banner activity tags publishedAt -_id")
+        .limit(maxLimit)
+        .then((data) => {
+            return res.json({
+                success: true,
+                blogs: data
+            })
+        })
+        .catch((err: any) => {
+            return res.status(500).json({ message: err })
+        })
+})
+
+router.post('/create-blog', GetUserMiddleware, async (req: Request, res: Response) => {
+    let { id, title, des, banner, content, tags, draft } = req.body
+
+    if (!title.length) {
+        return res.status(403).json({
+            success: false,
+            message: "Title can't be empty!"
+        })
+    }
+    if (!draft) {
+        if (!des.length || des.length > 200) {
+            return res.status(403).json({
+                success: false,
+                message: "Blog Description is invalid"
+            })
+        }
+        if (!banner.length) {
+            return res.status(403).json({
+                success: false,
+                message: "Can't publish blog without a Banner"
+            })
+        }
+        if (!content.blocks.length) {
+            return res.status(403).json({
+                success: false,
+                message: "Can't publish blog without anything in it."
+            })
+        }
+        if (!tags.length || tags.length > 8) {
+            return res.status(403).json({
+                success: false,
+                message: "Can't publish blog with invalid tags"
+            })
+        }
+    }
+    // make all the tags lowercase 
+    tags = tags.map((t: string) => t.toLowerCase())
+
+    // Generate Blog_id
+    let blog_id = title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, '-').trim() + nanoid()
+
+    try {
+        const blog = await Blog.create({
+            blog_id, title, des, banner, content, tags, draft: draft || false, author: id
+        })
+        const user = await User.findOneAndUpdate({ _id: id },
+            {
+                $inc: { "account_info.total_posts": draft ? 0 : 1 },
+                $push: { "blogs": blog._id }
+            }
+        )
+        return res.status(200).json({
+            success: true,
+            message: "Blog created successfully",
+            blog,
+            user
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({
+            success: false,
+            message: "Error creating blog",
+        })
     }
 })
 

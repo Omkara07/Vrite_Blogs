@@ -39,7 +39,7 @@ const Navbar = () => {
                     </div>
                 </div>
                 <div className='flex items-center md:gap-4 gap-2'>
-                    <Link to='/editor' className='hidden md:flex items-center text-gray-500 gap-1 mx-12 hover:text-gray-700 hover:font-semibold duration-150'>
+                    <Link to='/editor' className={`hidden md:flex items-center text-gray-500 gap-1 mx-12 hover:text-gray-700 hover:font-semibold duration-150`}>
                         < MdEditDocument />
                         <h3 className=''>Write</h3>
                     </Link>

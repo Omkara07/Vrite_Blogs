@@ -10,8 +10,7 @@ type BlogType = {
     banner: string,
     content: [],
     tags: [],
-    des: string,
-    author: { personal_info: {} }
+    des: string
 }
 
 export const BlogContext = createContext<any>({})
@@ -22,12 +21,12 @@ const Editor = memo(() => {
         banner: "",
         content: [],
         tags: [],
-        des: "",
-        author: { personal_info: {} }
+        des: ""
     })
     // const { userAuth } = useContext(AuthContext)
     const navigate = useNavigate()
     const [editorState, setEditorState] = useState<string>("editor")
+    const [textEditor, setTextEditor] = useState({ isReady: false })
 
     useEffect(() => {
         // console.log(userAuth)
@@ -39,7 +38,7 @@ const Editor = memo(() => {
     }, [])
     // console.log(userAuth)
     return (
-        <BlogContext.Provider value={{ blogCreds, setBlogCreds, editorState, setEditorState }}>
+        <BlogContext.Provider value={{ blogCreds, setBlogCreds, editorState, setEditorState, textEditor, setTextEditor }}>
             <>
                 {
                     editorState === "editor" ? <BlogEditor /> : <PublishForm />

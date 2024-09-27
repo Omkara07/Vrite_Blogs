@@ -22,7 +22,7 @@ function App() {
     <AuthContext.Provider value={{ userAuth, setUserAuth }} >
       <Routes>
         <Route path='/' element={<Layout />} >
-          <Route path="" element={<Home />} />
+          <Route index element={<Home />} />
           <Route path='signin' element={<Signin />} />
           <Route path='signup' element={<Signup />} />
         </Route>
