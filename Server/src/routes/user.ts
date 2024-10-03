@@ -71,6 +71,11 @@ export type ResponseUserType = {
     token: string
 }
 
+type paramType = {
+    filter: string,
+    page: number
+}
+
 // upload image url route
 router.get('/get-upload-url', async (req, res) => {
     generateUploadURL().then(url => res.json({ uploadURL: url }))
@@ -180,15 +185,12 @@ router.post('/signin', async (req: Request, res: Response) => {
 })
 
 router.post('/googleAuth', async (req: Request, res: Response) => {
-    console.log("start")
+
     try {
-        console.log("hehe")
         let { email, fullname, photoURL } = req.body
-        console.log(email, fullname, photoURL)
 
         // photoURL = photoURL?.replace("s96-c", "s384-c")
 
-        console.log("line1")
         const user = await User.findOne({ 'personal_info.email': email })
         if (user) {
             if (!user.google_auth) {
@@ -198,7 +200,7 @@ router.post('/googleAuth', async (req: Request, res: Response) => {
             }
 
             // User exists and has Google auth enabled, you can return a success response here
-            console.log("line2")
+
             const token = jwt.sign({ id: user._id }, JWT_SECRET);
             const resUser: ResponseUserType = {
                 email: user.personal_info?.email || "",
@@ -213,7 +215,6 @@ router.post('/googleAuth', async (req: Request, res: Response) => {
             });
         }
         else {
-            console.log("line3")
             let username = await generateUsername<string>(email as string)
 
             const user = await User.create({
@@ -224,7 +225,6 @@ router.post('/googleAuth', async (req: Request, res: Response) => {
                 return res.status(500).json({ message: "Error Logging in with Google", success: false })
             }
 
-            console.log("line4")
             const token = jwt.sign({ id: user._id }, JWT_SECRET)
             const resUser: ResponseUserType = {
                 email: email as string,
@@ -241,7 +241,6 @@ router.post('/googleAuth', async (req: Request, res: Response) => {
     }
 
     catch (e) {
-        console.log("line5", e)
         res.status(403).json({
             message: "Error Login in",
             success: false
@@ -266,13 +265,25 @@ router.get('/getuser', GetUserMiddleware, async (req: Request, res: Response) =>
     }
 })
 
-router.get("/latest-blogs", (req: Request, res: Response) => {
+router.get("/latest-blogs", GetUserMiddleware, (req: Request, res: Response) => {
     let maxLimit = 5;
+    const filter: string = req.query.filter as string
+    const page: number = parseInt(req.query.page as string)
+    const id: string = req.query.id as string
+    let filterOb: any = { draft: false }
+    console.log(filter, id)
 
-    Blog.find({ draft: false })
+    if (filter && filter !== "home") {
+        filterOb = { draft: false, "tags": { $in: filter } }
+    }
+    if (id) {
+        filterOb = { draft: false, author: id }
+    }
+    Blog.find(filterOb)
         .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
         .sort({ publishedAt: -1 })
         .select("blog_id title des banner activity tags publishedAt -_id")
+        .skip((page - 1) * maxLimit)
         .limit(maxLimit)
         .then((data) => {
             return res.json({
@@ -284,6 +295,177 @@ router.get("/latest-blogs", (req: Request, res: Response) => {
             return res.status(500).json({ message: err })
         })
 })
+
+router.get("/all-latest-blogs-count", (req: Request, res: Response) => {
+    const filter: string = req.query.filter as string
+    const id: string = req.query.id as string
+    let filterOb: any = { draft: false }
+    if (filter && filter !== "home") {
+        filterOb = { draft: false, "tags": { $in: filter } }
+    }
+    if (id) {
+        filterOb = { draft: false, author: id }
+    }
+    Blog.countDocuments(filterOb)
+        .then(count => {
+            return res.json({ success: true, totalDocs: count })
+        })
+        .catch((err) => {
+            res.status(500).json({ message: err.message })
+        })
+})
+
+router.get("/all-search-blogs-count", (req: Request, res: Response) => {
+    const filter: string = req.query.filter as string
+
+    Blog.countDocuments({
+        draft: false,
+        // logical or operator works on an array of elements 
+        $or: [{
+            title: {
+                // regex to match the patterns 
+                "$regex": filter
+            }
+        }, {
+            des: {
+                "$regex": filter
+            }
+        }, {
+            tags: {
+                "$regex": filter
+            }
+        }]
+    })
+        .then(count => {
+            return res.json({ success: true, totalDocs: count })
+        })
+        .catch((err) => {
+            res.status(500).json({ message: err.message })
+        })
+})
+
+router.get("/getBlogs", GetUserMiddleware, async (req: Request, res: Response) => {
+    let maxLimit = 5;
+    const filter = req.query.filter || "";
+    const page: number = parseInt(req.query.page as string)
+    if (!filter) {
+        return res.json({
+            blogs: []
+        })
+    }
+
+    const blogs = await Blog.find({
+        draft: false,
+        // logical or operator works on an array of elements 
+        $or: [{
+            title: {
+                // regex to match the patterns 
+                "$regex": filter
+            }
+        }, {
+            des: {
+                "$regex": filter
+            }
+        }, {
+            tags: {
+                "$regex": filter
+            }
+        }]
+    })
+        .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+        .sort({ publishedAt: -1 })
+        .select("blog_id title des banner activity tags publishedAt -_id")
+        .skip((page - 1) * maxLimit)
+        .limit(maxLimit)
+        .then((data) => {
+            return res.json({
+                success: true,
+                blogs: data
+            })
+        })
+        .catch((err: any) => {
+            return res.status(500).json({ message: err })
+        })
+})
+
+router.get("/getAuthors", GetUserMiddleware, async (req: Request, res: Response) => {
+    const filter = req.query.filter || "";
+    if (!filter) {
+        return res.json({
+            users: null
+        })
+    }
+    User.find({
+        $or: [
+            {
+                "personal_info.username": { $regex: filter }
+            },
+            {
+                "personal_info.fullname": { $regex: filter }
+            }
+        ]
+    })
+        .sort({ "personal_info.username": -1 })
+        .select("personal_info.profile_img personal_info.username personal_info.fullname -_id")
+        .then(users => {
+            res.json({ success: true, users })
+        })
+        .catch((err) => {
+            res.status(500).json({ message: err.message })
+        })
+
+})
+
+router.post("/get-profile", (req: Request, res: Response) => {
+    const { username } = req.body
+    User.findOne({ "personal_info.username": username })
+        .select("-personal_info.password -google_auth -updatedAt -blogs")
+        .then(user => {
+            res.json(user)
+        })
+        .catch(e => {
+            res.status(500).json({ message: e.message })
+        })
+})
+
+router.post("/getBlog", (req: Request, res: Response) => {
+    let incrementVal = 1;
+    const { blog_id } = req.body
+    Blog.findOneAndUpdate({
+        blog_id
+    }, {
+        $inc: { "activity.total_reads": incrementVal }
+    })
+        .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+        .select("blog_id title des banner content comments activity tags publishedAt -_id")
+        .then((data) => {
+            return res.json({
+                success: true,
+                blog: data
+            })
+        })
+        .catch((err: any) => {
+            return res.status(500).json({ message: err })
+        })
+})
+
+router.get("/trending-blogs", GetUserMiddleware, (req: Request, res: Response) => {
+    Blog.find({ draft: false })
+        .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+        .sort({ "activity.total_read": -1, "activity.total_likes": -1, publishedAt: -1 })
+        .select("blog_id title publishedAt -_id")
+        .limit(5)
+        .then((data) => {
+            return res.json({
+                success: true,
+                blogs: data
+            })
+        })
+        .catch((err) => {
+            return res.status(500).json({ message: err })
+        })
+})
+
 
 router.post('/create-blog', GetUserMiddleware, async (req: Request, res: Response) => {
     let { id, title, des, banner, content, tags, draft } = req.body

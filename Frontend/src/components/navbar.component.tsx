@@ -2,16 +2,19 @@ import { useContext, useRef, useState } from 'react'
 import { IoMdSearch, IoLogoVimeo } from "react-icons/io";
 import { MdEditDocument } from "react-icons/md";
 import "../index.css"
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaBell } from "react-icons/fa6";
 import User_Navigation from './User-navigation.component';
 import { AuthContext } from '../App';
 
+export let userNavRef: React.MutableRefObject<HTMLDivElement | null>
+
 const Navbar = () => {
     const [search, setSearch] = useState<boolean>(false);
-    const { userAuth } = useContext(AuthContext)
+    const { userAuth, filter, setFilter } = useContext(AuthContext)
     const [openUserNav, setUserNav] = useState<boolean>(false)
-    const userNavRef = useRef<HTMLDivElement | null>(null)
+    userNavRef = useRef<HTMLDivElement | null>(null)
+    const navigate = useNavigate()
 
     const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
         if (!userNavRef.current?.contains(e.relatedTarget as Node)) {
@@ -33,9 +36,11 @@ const Navbar = () => {
                         <IoLogoVimeo className='text-[35px]' />
                         <h1 className="font-bold text-gray-800 font-mono text-xl">rite</h1>
                     </Link>
-                    <div className="hidden md:flex w-[30%] items-center focus-within:text-black">
+                    <div className="hidden md:flex w-[30%] items-center focus-within:text-black" onClick={() => navigate('/search')}>
                         <IoMdSearch className="absolute translate-x-12 text-gray-500 text-xl focus:text-black" />
-                        <input type="text" placeholder="Search" className="transition duration-300 ease-in-out md:flex ml-10 pl-8 w-full bg-gray-100 p-2 rounded-xl focus:outline-none focus:bg-white" />
+                        <input onChange={(e) => {
+                            setFilter(e.target.value)
+                        }} value={filter} type="text" placeholder="Search" className="transition duration-300 ease-in-out md:flex ml-10 pl-8 w-full bg-[#F2F2F2] p-2 rounded-xl focus:outline-none focus:bg-white" />
                     </div>
                 </div>
                 <div className='flex items-center md:gap-4 gap-2'>
@@ -80,7 +85,7 @@ const Navbar = () => {
                 </div>
             </nav >
             <div className={`md:hidden transition-all duration-500 ease-in-out ${search ? 'max-h-[100px] opacity-100' : 'max-h-0 opacity-0'} flex w-auto items-center focus-within:text-black z-3`}>
-                <input type="text" placeholder="Search" className="md:flex ml-12 w-[80%] bg-gray-100 p-2 rounded-xl " />
+                <input type="text" placeholder="Search" className="md:flex ml-12 w-[80%] bg-gray-100 p-2 rounded-xl " onClick={() => navigate('/search')} onChange={(e) => setFilter(e.target.value)} />
                 <IoMdSearch className="flex ml-[-25px] text-gray-500 text-xl focus:text-black" />
             </div>
         </>

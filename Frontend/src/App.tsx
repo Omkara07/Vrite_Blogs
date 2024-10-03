@@ -7,24 +7,60 @@ import { Routes, Route, Outlet } from "react-router-dom";
 import { createContext, useEffect, useState } from 'react';
 import Navbar from './components/navbar.component.tsx';
 import Editor from './pages/Editor.page.tsx';
+import { MutatingDots } from 'react-loader-spinner'
+import Search from './pages/Search.page.tsx';
+import NotFound404 from './pages/404.page.tsx';
+import ProfilePage from './pages/ProfilePage.page.tsx';
+import BlogPage from './pages/BlogPage.page.tsx';
 
+type userType = {
+  email: string,
+  username: string
+  profile_img: string
+  token: string
+}
 export const AuthContext = createContext<any>({});
 function App() {
   const userr = localStorage.getItem("userAuth");
-  const [userAuth, setUserAuth] = useState<any>(null)
+  const [userAuth, setUserAuth] = useState<userType>({ email: "", username: "", profile_img: "", token: "" })
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState<string>("")
 
   useEffect(() => {
-    if (userr) {
-      setUserAuth(JSON.parse(userr))
+    const f = async () => {
+      if (userr) {
+        const parsedUser = JSON.parse(userr);
+        await setUserAuth(parsedUser);
+      }
+      setLoading(false)
     }
-  }, [])
+    f()
+  }, [userr])
+
+  if (loading) {
+    return <div className='flex justify-center items-center mt-56'><MutatingDots
+      visible={true}
+      height="100"
+      width="100"
+      color="black"
+      secondaryColor="black"
+      radius="12.5"
+      ariaLabel="mutating-dots-loading"
+      wrapperStyle={{}}
+      wrapperClass=""
+    /></div>
+  }
   return (
-    <AuthContext.Provider value={{ userAuth, setUserAuth }} >
+    <AuthContext.Provider value={{ userAuth, setUserAuth, filter, setFilter }} >
       <Routes>
         <Route path='/' element={<Layout />} >
           <Route index element={<Home />} />
           <Route path='signin' element={<Signin />} />
           <Route path='signup' element={<Signup />} />
+          <Route path='search' element={<Search />} />
+          <Route path='user/:id' element={<ProfilePage />} />
+          <Route path='blog/:blog_id' element={<BlogPage />} />
+          <Route path='*' element={<NotFound404 />} />
         </Route>
         <Route path='/editor' element={<Editor />}></Route>
       </Routes>

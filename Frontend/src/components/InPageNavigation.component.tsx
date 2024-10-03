@@ -7,10 +7,14 @@ type props = {
     inPageNavIndex?: number,
     defaultHidden: string[],
     children: React.ReactNode
+    cap?: boolean
 }
-const InPageNavigation: React.FC<props> = ({ routes, defaultHidden, inPageNavIndex = 0, children }) => {
-    const activeTabLineRef = useRef<HTMLHRElement | null>(null);
-    const activeTabRef = useRef<HTMLButtonElement | null>(null)
+
+export let activeTabLineRef: React.MutableRefObject<HTMLHRElement | null>;
+export let activeTabRef: React.MutableRefObject<HTMLButtonElement | null>
+const InPageNavigation: React.FC<props> = ({ routes, defaultHidden, inPageNavIndex = 0, children, cap = true }) => {
+    activeTabLineRef = useRef<HTMLHRElement | null>(null);
+    activeTabRef = useRef<HTMLButtonElement | null>(null)
     const [activeRoute, setActiveRoute] = React.useState<number>(0)
 
     const handleRouteClick = (btn: HTMLButtonElement, i: number) => {
@@ -23,15 +27,15 @@ const InPageNavigation: React.FC<props> = ({ routes, defaultHidden, inPageNavInd
     }
 
     useEffect(() => {
-        handleRouteClick(activeTabRef.current as HTMLButtonElement, inPageNavIndex,)
+        handleRouteClick(activeTabRef.current as HTMLButtonElement, inPageNavIndex)
     }, [])
     return (
         <PageAnimation>
-            <div className='relative flex flex-nowrap overflow-x-auto mb-10 border-b border-gray-200  '>
+            <div className='relative flex flex-nowrap overflow-x-auto mb-10 border-b border-gray-200 min-w-full '>
 
                 {routes.map((route: string, i: number) => {
                     return (
-                        <button ref={i === inPageNavIndex ? activeTabRef : null} key={i} className={`p-4 px-10 capitalize font-semibold hover:text-black transition duration-500  ${activeRoute === i ? "text-black " : "text-gray-400"} ${defaultHidden.includes(route) ? "md:hidden" : ""}`}
+                        <button ref={i === inPageNavIndex ? activeTabRef : null} key={i} className={`p-4 px-10 ${cap ? "capitalize" : ""} font-semibold hover:text-black transition duration-500  ${activeRoute === i ? "text-black " : "text-gray-400"} ${defaultHidden.includes(route) ? "md:hidden" : ""}`}
                             onClick={(e) => handleRouteClick(e.target as HTMLButtonElement, i)}
                         >
 

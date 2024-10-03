@@ -15,7 +15,6 @@ export const GetUserMiddleware = (req: Request, res: Response, next: NextFunctio
         try {
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET as string)
-            console.log(!decoded)
             if (!decoded) {
                 res.status(401).json({ message: "Unauthorized User" })
             }

@@ -25,7 +25,7 @@ const User_Navigation: React.FC<Props> = ({ username, setUserNav }) => {
                     < MdEditDocument />
                     <h3 className=''>Write</h3>
                 </Link>
-                <Link to='/dashboard/user' className='flex justify-center gap-2  text-gray-500 items-center hover:font-semibold hover:text-black duration-100 hover:bg-white p-2.5'>
+                <Link to={`/user/${username}`} className='flex justify-center gap-2  text-gray-500 items-center hover:font-semibold hover:text-black duration-100 hover:bg-white p-2.5'>
                     <h3>Profile</h3>
                 </Link>
                 <Link to='/dashboard/blogs' className='flex justify-center gap-2  text-gray-500 items-center hover:font-semibold hover:text-black duration-100 hover:bg-white p-2.5'>

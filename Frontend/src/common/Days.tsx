@@ -25,10 +25,29 @@ const days: string[] = [
     "Sat"
 ];
 
-const getDays = (d: string): string => {
-    const date = new Date(d)
+// Function to get appropriate date suffix
+const getDateSuffix = (date: number): string => {
+    if (date > 3 && date < 21) return 'th'; // Handles 11th, 12th, 13th
+    switch (date % 10) {
+        case 1: return "st";
+        case 2: return "nd";
+        case 3: return "rd";
+        default: return "th";
+    }
+};
 
-    return `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getFullYear()} `
+const getDays = (d: string): string => {
+    const date = new Date(d);
+
+    return `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-export default getDays
+const getDate = (d: string): string => {
+    const date = new Date(d);
+    const day = date.getDate();
+
+    // Add the day with the correct suffix
+    return `${day}${getDateSuffix(day)} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+export { getDays, getDate };
