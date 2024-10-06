@@ -140,7 +140,7 @@ const ProfilePage = () => {
                             <div className='md:flex md:px-20 md:w-full max-md:w-full h-cover pt-6 overflow-hidden min-[1100px]:gap-12 gap-5 '>
                                 <div className="flex flex-col gap-7 md:w-full md:px-20">
                                     <div className='flex flex-col md:hidden max-md:items-center gap-5 min-w-[250px] mb-6'>
-                                        <img src={profile_img} className='md:w-32 w-48 rounded-full' alt="" />
+                                        <img src={profile_img} className='md:w-32 w-48 rounded-full' alt="Profile Picture" />
                                         <h1 className='text-gray-600 text-2xl font-semibold'>@{profile_username}</h1>
                                         <h1 className='text-xl capitalize'>{fullname}</h1>
                                         <p className=''>{total_posts.toLocaleString()} Blogs - {total_reads.toLocaleString()} Reads</p>

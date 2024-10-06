@@ -8,13 +8,14 @@ import { toast } from 'sonner';
 import BlackBtn from './blackBtn.component';
 import axios from 'axios';
 import { AuthContext } from '../App';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const PublishForm = () => {
     const { blogCreds, setEditorState, setBlogCreds } = useContext(BlogContext)
     const { userAuth } = useContext(AuthContext)
     const [tag, setTag] = useState<string>("")
     const navigate = useNavigate()
+    const { blog_id } = useParams()
     const handleClose = () => {
         setEditorState("editor")
     }
@@ -74,7 +75,7 @@ const PublishForm = () => {
 
         const blogToast = toast.loading("Publishing...")
         axios.post(import.meta.env.VITE_server_url + '/user/create-blog',
-            blog, {
+            { ...blog, blogId: blog_id }, {
             headers: {
                 "Authorization": `Bearer ${userAuth.token}`,
                 "Content-Type": "application/json"

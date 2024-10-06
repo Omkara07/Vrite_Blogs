@@ -63,6 +63,7 @@ function App() {
           <Route path='*' element={<NotFound404 />} />
         </Route>
         <Route path='/editor' element={<Editor />}></Route>
+        <Route path='/editor/:blog_id' element={<Editor />}></Route>
       </Routes>
     </AuthContext.Provider>
   )

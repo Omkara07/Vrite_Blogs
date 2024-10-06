@@ -32,7 +32,7 @@ const Search = () => {
 
     const loadBlogs = async ({ page = 1, create_new_arr = false }) => {
         try {
-            const res = await axios.get(import.meta.env.VITE_server_url + `/user/getBlogs?filter=${debounceval}&page=${page}`, {
+            const res = await axios.post(import.meta.env.VITE_server_url + `/user/getBlogs?filter=${debounceval}&page=${page}`, {
                 headers: {
                     Authorization: "Bearer " + token
                 }

@@ -1,3 +1,43 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .animate-gradient-text {
+      background: linear-gradient(to right, #f3e8ff, #d8b4fe, #f3e8ff);
+      background-size: 200% 200%;
+      animation: gradient-text 11s linear infinite;
+    }
+  }
+  @keyframes gradient-text {
+    0% {
+      background-position: 200% 0%;
+    }
+    50% {
+      background-position: -200% 100%;
+    }
+    100% {
+      background-position: 200% 0%;
+    }
+  }
+
+
+@layer utilities {
+    .animate-button {
+      background: linear-gradient(to right, #f11b1b, #fa9494, #f11b1b);
+      background-size: 200% 200%;
+      animation: gradient-text 11s linear infinite;
+      color: white
+    }
+  }
+  @keyframes gradient-text {
+    0% {
+      background-position: 200% 0%;
+    }
+    50% {
+      background-position: -200% 100%;
+    }
+    100% {
+      background-position: 200% 0%;
+    }
+  }

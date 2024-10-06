@@ -1,6 +1,6 @@
 import React, { memo, useContext, useEffect } from 'react'
 import { IoLogoVimeo } from 'react-icons/io'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import PageAnimation from '../common/page-animation'
 import { useRef } from 'react'
 import uploadImage from '../common/aws'
@@ -18,12 +18,13 @@ const BlogEditor = memo(() => {
   const { textEditor, setTextEditor, blogCreds, setBlogCreds, setEditorState } = useContext(BlogContext)
   const { userAuth } = useContext(AuthContext)
   const navigate = useNavigate()
+  const { blog_id } = useParams()
 
   useEffect(() => {
     if (!textEditor.isReady) {
       setTextEditor(new EditorJS({
         holder: 'textEditor',
-        data: blogCreds.content,
+        data: Array.isArray(blogCreds.content) ? blogCreds.content[0] : blogCreds.content,
         placeholder: "What's on your mind?",
         tools: Tools
       }))
@@ -115,7 +116,7 @@ const BlogEditor = memo(() => {
 
         const blogToast = toast.loading("Saving Draft...")
         axios.post(import.meta.env.VITE_server_url + '/user/create-blog',
-          blog, {
+          { ...blog, blogId: blog_id }, {
           headers: {
             "Authorization": `Bearer ${userAuth.token}`,
             "Content-Type": "application/json"

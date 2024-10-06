@@ -10,6 +10,7 @@ import * as admin from 'firebase-admin'
 import * as serviceAccount from '../../blog-app-dd1ff-firebase-adminsdk-zulwp-181549e0ad.json'
 import aws from "aws-sdk";
 import Blog from "../Schemas/Blog";
+import Notification from "../Schemas/Notification";
 
 dotenv.config()
 
@@ -271,7 +272,6 @@ router.get("/latest-blogs", GetUserMiddleware, (req: Request, res: Response) => 
     const page: number = parseInt(req.query.page as string)
     const id: string = req.query.id as string
     let filterOb: any = { draft: false }
-    console.log(filter, id)
 
     if (filter && filter !== "home") {
         filterOb = { draft: false, "tags": { $in: filter } }
@@ -344,34 +344,45 @@ router.get("/all-search-blogs-count", (req: Request, res: Response) => {
         })
 })
 
-router.get("/getBlogs", GetUserMiddleware, async (req: Request, res: Response) => {
+router.post("/getBlogs", GetUserMiddleware, async (req: Request, res: Response) => {
     let maxLimit = 5;
     const filter = req.query.filter || "";
     const page: number = parseInt(req.query.page as string)
-    if (!filter) {
+    const tags: string[] = req.body.tags
+    const eliminate_blog = req.query.eliminate_blog as string
+    // console.log(tags, eliminate_blog)
+
+    let filterOb: any = { draft: false }
+    if (!filter && !tags) {
         return res.json({
             blogs: []
         })
     }
+    if (filter) {
+        filterOb = {
+            draft: false,
+            // logical or operator works on an array of elements 
+            $or: [{
+                title: {
+                    // regex to match the patterns 
+                    "$regex": filter
+                }
+            }, {
+                des: {
+                    "$regex": filter
+                }
+            }, {
+                tags: {
+                    "$regex": filter
+                }
+            }]
+        }
+    }
+    if (tags) {
+        filterOb = { draft: false, tags: { $in: tags }, blog_id: { $ne: eliminate_blog } }
+    }
 
-    const blogs = await Blog.find({
-        draft: false,
-        // logical or operator works on an array of elements 
-        $or: [{
-            title: {
-                // regex to match the patterns 
-                "$regex": filter
-            }
-        }, {
-            des: {
-                "$regex": filter
-            }
-        }, {
-            tags: {
-                "$regex": filter
-            }
-        }]
-    })
+    const blogs = await Blog.find(filterOb)
         .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
         .sort({ publishedAt: -1 })
         .select("blog_id title des banner activity tags publishedAt -_id")
@@ -428,25 +439,100 @@ router.post("/get-profile", (req: Request, res: Response) => {
         })
 })
 
-router.post("/getBlog", (req: Request, res: Response) => {
-    let incrementVal = 1;
-    const { blog_id } = req.body
-    Blog.findOneAndUpdate({
-        blog_id
-    }, {
-        $inc: { "activity.total_reads": incrementVal }
-    })
-        .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
-        .select("blog_id title des banner content comments activity tags publishedAt -_id")
-        .then((data) => {
+router.post("/getBlog", async (req: Request, res: Response) => {
+    const { blog_id, draft, isEdit } = req.body
+    let incrementVal = isEdit ? 0 : 1;
+    try {
+
+        const data = await Blog.findOneAndUpdate({
+            blog_id
+        }, {
+            $inc: { "activity.total_reads": incrementVal }
+        })
+            .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+            .select("blog_id title des banner content comments activity tags publishedAt -_id")
+
+        if (!data) {
+            res.status(404).json({ success: false, message: "Blog not found" })
+        }
+        else {
+            // @ts-ignore
+            const username = data?.author?.personal_info?.username;
+            if (username) {
+                User.findOneAndUpdate({ "personal_info.username": username }, {
+                    $inc: { "account_info.total_reads": incrementVal }
+                })
+                    .catch((e) => {
+                        res.status(500).json({ message: e })
+                    })
+
+            }
+            if (data.draft && !draft) {
+                return res.status(500).json({ message: "Can't access draft blog" })
+            }
             return res.json({
                 success: true,
                 blog: data
             })
+        }
+    }
+    catch (err: any) {
+        return res.status(500).json({ message: err })
+    }
+})
+
+router.post("/like-blog", GetUserMiddleware, (req: Request, res: Response) => {
+    const { blog_id, isLiked, id } = req.body
+
+    const incrementcnt = !isLiked ? 1 : -1;
+    Blog.findOneAndUpdate({ blog_id }, {
+        $inc: { "activity.total_likes": incrementcnt }
+    })
+        .then((blog) => {
+            if (!isLiked) {
+                Notification.create({
+                    type: "like",
+                    blog: blog?._id,
+                    notification_for: blog?.author,
+                    user: id
+                })
+                    .then((noti) => {
+                        res.json({ message: "Blog liked successfully", success: true })
+                    })
+                    .catch((e) => {
+                        res.status(500).json({ message: e, success: false })
+                    })
+            }
+            else {
+                Notification.findOneAndDelete({ type: 'like', blog: blog?._id, notification_for: blog?.author, user: id })
+                    .then((noti) => {
+                        res.json({ message: "Blog disliked successfully", success: true })
+                    })
+                    .catch((e) => {
+                        res.status(500).json({ message: e, success: false })
+                    })
+            }
         })
-        .catch((err: any) => {
-            return res.status(500).json({ message: err })
+        .catch((e) => {
+            res.status(500).json({ message: e, success: false })
         })
+})
+
+router.post("/is-blog-liked", GetUserMiddleware, (req: Request, res: Response) => {
+    const { blog_id, id } = req.body
+    Blog.findOne({ blog_id }).then((blog) => {
+        Notification.findOne({ blog: blog?._id, type: 'like', user: id })
+            .then((result) => {
+                res.json({ result })
+            })
+            .catch((e) => [
+                res.status(500).json({ message: e })
+            ])
+    })
+        .catch((e) => {
+            res.status(500).json({ message: e })
+        })
+
 })
 
 router.get("/trending-blogs", GetUserMiddleware, (req: Request, res: Response) => {
@@ -468,7 +554,7 @@ router.get("/trending-blogs", GetUserMiddleware, (req: Request, res: Response) =
 
 
 router.post('/create-blog', GetUserMiddleware, async (req: Request, res: Response) => {
-    let { id, title, des, banner, content, tags, draft } = req.body
+    let { id, title, des, banner, content, tags, draft, blogId } = req.body
 
     if (!title.length) {
         return res.status(403).json({
@@ -505,32 +591,47 @@ router.post('/create-blog', GetUserMiddleware, async (req: Request, res: Respons
     // make all the tags lowercase 
     tags = tags.map((t: string) => t.toLowerCase())
 
-    // Generate Blog_id
-    let blog_id = title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, '-').trim() + nanoid()
 
-    try {
-        const blog = await Blog.create({
-            blog_id, title, des, banner, content, tags, draft: draft || false, author: id
+    // Generate Blog_id
+    let blog_id = blogId || title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, '-').trim() + nanoid()
+
+    if (blogId) {
+        Blog.findOneAndUpdate({ blog_id }, {
+            title, des, banner, content, tags, draft: draft ? draft : false
         })
-        const user = await User.findOneAndUpdate({ _id: id },
-            {
-                $inc: { "account_info.total_posts": draft ? 0 : 1 },
-                $push: { "blogs": blog._id }
-            }
-        )
-        return res.status(200).json({
-            success: true,
-            message: "Blog created successfully",
-            blog,
-            user
-        })
+            .then(() => {
+                res.json({ blog_id, success: true, message: "Blog updated successfully" })
+            })
+            .catch((e) => {
+                res.status(500).json({ message: e, success: false })
+            })
     }
-    catch (err) {
-        console.log(err)
-        res.status(500).json({
-            success: false,
-            message: "Error creating blog",
-        })
+    else {
+
+        try {
+            const blog = await Blog.create({
+                blog_id, title, des, banner, content, tags, draft: draft || false, author: id
+            })
+            const user = await User.findOneAndUpdate({ _id: id },
+                {
+                    $inc: { "account_info.total_posts": draft ? 0 : 1 },
+                    $push: { "blogs": blog._id }
+                }
+            )
+            return res.status(200).json({
+                success: true,
+                message: "Blog created successfully",
+                blog,
+                user
+            })
+        }
+        catch (err) {
+            console.log(err)
+            res.status(500).json({
+                success: false,
+                message: "Error creating blog",
+            })
+        }
     }
 })
 
