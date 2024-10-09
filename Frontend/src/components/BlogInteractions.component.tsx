@@ -13,7 +13,6 @@ import axios from 'axios';
 const BlogInteractions = () => {
     const { blog, setBlog, isLiked, setIsLiked, commentSection, setCommentSection } = useContext(BlogPageContext)
     const { userAuth: { username: LoggedUsername, token } } = useContext(AuthContext)
-    console.log(blog)
     if (!blog) {
         return (
             <div>...</div>
@@ -23,7 +22,6 @@ const BlogInteractions = () => {
 
     const handleLike = (e: React.MouseEvent<HTMLButtonElement>) => {
         if (token) {
-            console.log("liked")
             setIsLiked(!isLiked)
             !isLiked ? total_likes++ : total_likes--;
             setBlog({ ...blog, activity: { ...activity, total_likes } })

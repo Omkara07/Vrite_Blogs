@@ -54,15 +54,17 @@ const Table: React.FC<any> = ({ content }) => {
     return (
         <div className='px-10'>
             <table className="min-w-full border-4 rounded-lg border-gray-800 bg-white shadow-md">
-                {content.map((row: string[], index: number) => (
-                    <tr key={index} className={`hover:bg-gray-100 hover:text-black hover:border-4 hover:border-black transition-colors duration-300 text-gray-600 `}>
-                        {row.map((data: string, i: number) => (
-                            <td className={`border-2 border-gray-800 p-4 `} key={i}>
-                                {data}
-                            </td>
-                        ))}
-                    </tr>
-                ))}
+                <tbody>
+                    {content.map((row: string[], index: number) => (
+                        <tr key={index} className={`hover:bg-gray-100 hover:text-black hover:border-4 hover:border-black transition-colors duration-300 text-gray-600 `}>
+                            {row.map((data: string, i: number) => (
+                                <td className={`border-2 border-gray-800 p-4 `} key={i}>
+                                    {data}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
             </table>
         </div>
     )

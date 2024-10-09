@@ -1,11 +1,35 @@
 import React, { useContext } from 'react'
-import { BlogPageContext } from '../pages/BlogPage.page'
+import { BlogPageContext, fetchComments, blogType } from '../pages/BlogPage.page'
 import { RxCross2 } from "react-icons/rx";
 import CommentField from './CommentField.component';
-
-
+import PageAnimation from '../common/page-animation';
+import CommentCard from './CommentCard.component';
+import NoData from './NoData.component';
+import ProfilePage from '../pages/ProfilePage.page';
+export type commentType = {
+    blog_id: string
+    blog_author: string
+    children: []
+    childrenLevel: number
+    comment: string
+    commentedAt: string
+    commented_by: {
+        personal_info: {
+            fullname: string
+            username: string
+            profile_img: string
+        }
+    }
+}
 const CommentSection = () => {
-    const { commentSection, setCommentSection, blog: { title } } = useContext(BlogPageContext)
+    const { commentSection, setCommentSection, blog: { blog_id, title, comments: { results: commentsArr }, activity: { total_parent_comments } }, blog, setBlog, totalParentComments, setTotalParentComments } = useContext(BlogPageContext)
+
+    const loadMoreComments = async () => {
+        let newCommentArr = await fetchComments({ skip: totalParentComments, blog_id, setParentCommentFun: setTotalParentComments, comment_array: commentsArr })
+
+        setBlog((prevBlog: blogType) => ({ ...prevBlog, comments: newCommentArr }))
+        console.log(blog)
+    }
     return (
         <div className={`max-sm:w-full fixed duration-700 max-sm:right-0 sm:top-0 w-[30%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden ${commentSection ? "top-0 sm:right-0" : "top-[100%] sm:right-[-100%]"} font-gelasio`}>
 
@@ -20,6 +44,23 @@ const CommentSection = () => {
             <hr className='bg-gray-200 my-8 w-[120%] -ml-10' />
 
             <CommentField action="Comment" />
+
+            <div className='flex flex-col gap-5 mt-8 w-full'>
+                {
+                    commentsArr && commentsArr.length ?
+                        commentsArr.map((comment: any, i: number) => {
+                            return <PageAnimation key={i} transition={{ duration: 0.7, delay: i * .2 }}>
+                                <CommentCard index={i} leftLev={comment.childrenLevel} commentData={comment} />
+                            </PageAnimation>
+                        })
+                        :
+                        <NoData message='No comments yet' />
+                }
+                {
+                    total_parent_comments > totalParentComments &&
+                    <button className='text-gray-500 hover:text-black' onClick={loadMoreComments}>Load more</button>
+                }
+            </div>
         </div>
     )
 }

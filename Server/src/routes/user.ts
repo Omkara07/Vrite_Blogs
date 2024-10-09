@@ -11,6 +11,7 @@ import * as serviceAccount from '../../blog-app-dd1ff-firebase-adminsdk-zulwp-18
 import aws from "aws-sdk";
 import Blog from "../Schemas/Blog";
 import Notification from "../Schemas/Notification";
+import Comment from "../Schemas/Comment";
 
 dotenv.config()
 
@@ -532,7 +533,77 @@ router.post("/is-blog-liked", GetUserMiddleware, (req: Request, res: Response) =
         .catch((e) => {
             res.status(500).json({ message: e })
         })
+})
 
+router.post("/add-comment", GetUserMiddleware, (req: Request, res: Response) => {
+    const { blog_id, comment, id } = req.body
+
+    if (!comment.length) {
+        return res.status(500).json({ message: "Can't post an empty comment" })
+    }
+
+    try {
+
+        Blog.findOneAndUpdate({ blog_id }, {
+            $inc: { "activity.total_comments": 1, "activity.total_parent_comments": 1 }
+        })
+            .then((blog) => {
+                if (!blog) {
+                    return res.status(500).json({ message: "Something went wrong", success: false })
+                }
+                Comment.create({
+                    blog_id: blog?._id,
+                    blog_author: blog?.author,
+                    comment,
+                    commented_by: id
+                })
+                    .then((commentFile) => {
+                        Blog.findOneAndUpdate({ blog_id },
+                            {
+                                $push: { "comments": commentFile._id },
+                            }
+                        )
+                            .then((blog) => {
+                                console.log("comment added to blog")
+                            })
+                        Notification.create({
+                            type: 'comment',
+                            blog: blog?._id,
+                            user: id,
+                            notification_for: blog?.author,
+                            comment: commentFile._id,
+                        })
+                            .then((not) => {
+                                console.log("notification for comment done")
+                            })
+
+                        res.json({ comment: commentFile, success: true })
+                    })
+            })
+    }
+    catch (e) {
+        res.status(500).json({ message: e, success: false })
+    }
+
+})
+
+router.post("/get-blog-comments", async (req: Request, res: Response) => {
+    const { blog_id, skip, id } = req.body
+    let maxLimit = 5;
+    const blog = await Blog.findOne({ blog_id })
+    Comment.find({ blog_id: blog?._id, isReply: false })
+        .populate("commented_by", "personal_info.username personal_info.fullname personal_info.profile_img")
+        .skip(skip)
+        .limit(maxLimit)
+        .sort({
+            'commentedAt': -1
+        })
+        .then(comment => {
+            return res.json(comment);
+        })
+        .catch(err => {
+            return res.status(500).json({ message: err, success: false })
+        })
 })
 
 router.get("/trending-blogs", GetUserMiddleware, (req: Request, res: Response) => {

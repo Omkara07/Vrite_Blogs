@@ -15,7 +15,7 @@ import CommentSection from '../components/CommentSection.component'
 export type ContentType = {
     blocks: any[]
 }
-type blogType = {
+export type blogType = {
     blog_id: string
     banner: string
     title: string
@@ -30,6 +30,7 @@ type blogType = {
         total_parent_comments: number
     },
     publishedAt: string
+    comments: any[]
 }
 
 
@@ -53,7 +54,38 @@ const defaultBlog = {
         total_reads: 0,
         total_parent_comments: 0,
     },
-    publishedAt: ""
+    publishedAt: "",
+    comments: []
+}
+
+type props = {
+    skip?: number,
+    blog_id: string,
+    setParentCommentFun: React.Dispatch<React.SetStateAction<number>>,
+    comment_array?: []
+}
+export const fetchComments = async ({ skip = 0, blog_id, setParentCommentFun, comment_array = [] }: props) => {
+    let res;
+    await axios.post(import.meta.env.VITE_server_url + '/user/get-blog-comments', {
+        blog_id: blog_id,
+        skip
+    })
+        .then(({ data }) => {
+            data.map((comment: any) => {
+                comment.childrenLevel = 0;
+            })
+
+            setParentCommentFun((pre: number) => pre + data.length)
+
+            if (!comment_array.length) {
+                res = { results: data }
+            }
+            else {
+                res = { results: [...comment_array, ...data] }
+            }
+        })
+
+    return res;
 }
 
 export const BlogPageContext = createContext<any>(null)
@@ -62,8 +94,8 @@ const BlogPage = () => {
     const [blog, setBlog] = useState<blogType>(defaultBlog)
     const [isLiked, setIsLiked] = useState<boolean>(false)
     const [similarBlogs, setSimilarBlogs] = useState<any>(null)
-    const [commentSection, setCommentSection] = useState<boolean>(true)
-    const [totalParentComments, setTotalParentComments] = useState<boolean>(false)
+    const [commentSection, setCommentSection] = useState<boolean>(false)
+    const [totalParentComments, setTotalParentComments] = useState<number>(0)
     const { userAuth: { token } } = useContext(AuthContext)
     const [loading, setLoading] = useState<boolean>(true)
     const fetchBlog = () => {
@@ -72,10 +104,11 @@ const BlogPage = () => {
                 blog_id: BlogPage_id
             }
         )
-            .then(res => {
+            .then(async (res) => {
+                res.data.blog.comments = await fetchComments({ blog_id: res.data.blog?.blog_id, setParentCommentFun: setTotalParentComments })
                 setBlog(res.data.blog)
+                console.log(res.data.blog)
                 fetchSimilarBlogs(res.data.blog.tags)
-                // console.log(res.data)
                 setLoading(false)
             })
             .catch((e) => {
@@ -108,8 +141,6 @@ const BlogPage = () => {
         resetState()
         fetchBlog()
     }, [BlogPage_id])
-    // console.log(similarBlogs)
-    console.log(content)
     return (
         <PageAnimation >
             {
