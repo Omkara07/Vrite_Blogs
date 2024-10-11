@@ -81,7 +81,7 @@ const BlogInteractions = () => {
                         </p>
                     </div>
                     <div className='flex gap-2 items-center'>
-                        <button className='bg-[#F2F2F2] rounded-full px-3 py-2 ' onClick={() => setCommentSection((prev: boolean) => !prev)}>
+                        <button className='bg-[#F2F2F2] rounded-full px-3 py-2 hover:text-green-700 hover:bg-green-50' onClick={() => setCommentSection((prev: boolean) => !prev)}>
                             <FaRegCommentDots />
                         </button>
                         <p className='text-gray-600 text-[17px]'>

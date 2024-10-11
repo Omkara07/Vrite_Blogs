@@ -84,6 +84,9 @@ export const fetchComments = async ({ skip = 0, blog_id, setParentCommentFun, co
                 res = { results: [...comment_array, ...data] }
             }
         })
+        .catch((e) => {
+            console.log(e)
+        })
 
     return res;
 }
@@ -105,10 +108,11 @@ const BlogPage = () => {
             }
         )
             .then(async (res) => {
-                res.data.blog.comments = await fetchComments({ blog_id: res.data.blog?.blog_id, setParentCommentFun: setTotalParentComments })
+                const fetchedComments = await fetchComments({ blog_id: res.data.blog?.blog_id, setParentCommentFun: setTotalParentComments })
+                res.data.blog.comments = fetchedComments
                 setBlog(res.data.blog)
-                console.log(res.data.blog)
-                fetchSimilarBlogs(res.data.blog.tags)
+                // console.log(res.data.blog)
+                await fetchSimilarBlogs(res.data.blog.tags)
                 setLoading(false)
             })
             .catch((e) => {
@@ -136,6 +140,8 @@ const BlogPage = () => {
         setBlog(defaultBlog)
         setSimilarBlogs(null)
         setLoading(true)
+        setCommentSection(false)
+        setTotalParentComments(0)
     }
     useEffect(() => {
         resetState()

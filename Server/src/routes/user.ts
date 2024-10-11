@@ -12,6 +12,7 @@ import aws from "aws-sdk";
 import Blog from "../Schemas/Blog";
 import Notification from "../Schemas/Notification";
 import Comment from "../Schemas/Comment";
+import { Types } from "mongoose";
 
 dotenv.config()
 
@@ -535,8 +536,9 @@ router.post("/is-blog-liked", GetUserMiddleware, (req: Request, res: Response) =
         })
 })
 
-router.post("/add-comment", GetUserMiddleware, (req: Request, res: Response) => {
-    const { blog_id, comment, id } = req.body
+router.post("/add-comment", GetUserMiddleware, async (req: Request, res: Response) => {
+    let { blog_id, comment, replying_to, id } = req.body
+    console.log(replying_to)
 
     if (!comment.length) {
         return res.status(500).json({ message: "Can't post an empty comment" })
@@ -545,19 +547,27 @@ router.post("/add-comment", GetUserMiddleware, (req: Request, res: Response) => 
     try {
 
         Blog.findOneAndUpdate({ blog_id }, {
-            $inc: { "activity.total_comments": 1, "activity.total_parent_comments": 1 }
+            $inc: { "activity.total_comments": 1, "activity.total_parent_comments": replying_to ? 0 : 1 }
         })
-            .then((blog) => {
+            .then(async (blog) => {
                 if (!blog) {
                     return res.status(500).json({ message: "Something went wrong", success: false })
                 }
-                Comment.create({
+                let commentObj = {
                     blog_id: blog?._id,
                     blog_author: blog?.author,
                     comment,
-                    commented_by: id
-                })
-                    .then((commentFile) => {
+                    commented_by: id,
+                    parent: null,
+                    isReply: false
+                }
+                if (replying_to) {
+                    commentObj.parent = replying_to
+                    commentObj.isReply = true
+                }
+                Comment.create(commentObj)
+                    .then(async (commentFile) => {
+                        console.log(commentFile)
                         Blog.findOneAndUpdate({ blog_id },
                             {
                                 $push: { "comments": commentFile._id },
@@ -566,18 +576,33 @@ router.post("/add-comment", GetUserMiddleware, (req: Request, res: Response) => 
                             .then((blog) => {
                                 console.log("comment added to blog")
                             })
-                        Notification.create({
-                            type: 'comment',
+                        let notifiObj = {
+                            type: replying_to ? 'reply' : 'comment',
                             blog: blog?._id,
                             user: id,
                             notification_for: blog?.author,
                             comment: commentFile._id,
-                        })
+                            replied_on_comment: null
+                        }
+                        if (replying_to) {
+                            notifiObj.replied_on_comment = replying_to;
+                            await Comment.findOneAndUpdate({ _id: replying_to },
+                                {
+                                    $push: { children: commentFile._id }
+                                }
+                            )
+                                .then((replyingToCommentDoc) => {
+                                    if (notifiObj) {
+                                        notifiObj.notification_for = replyingToCommentDoc?.commented_by!
+                                    }
+                                })
+                        }
+                        Notification.create(notifiObj)
                             .then((not) => {
                                 console.log("notification for comment done")
                             })
 
-                        res.json({ comment: commentFile, success: true })
+                        return res.json({ comment: commentFile, success: true })
                     })
             })
     }
@@ -603,6 +628,79 @@ router.post("/get-blog-comments", async (req: Request, res: Response) => {
         })
         .catch(err => {
             return res.status(500).json({ message: err, success: false })
+        })
+})
+
+router.post("/get-replies", async (req: Request, res: Response) => {
+    const { _id, skip } = req.body;
+    const maxLimit = 5;
+    Comment.findOne({ _id })
+        .populate({
+            path: "children",
+            options: {
+                limit: maxLimit,
+                skip: skip,
+                sort: { 'commentAt': -1 }
+            },
+            populate: {
+                path: "commented_by",
+                select: "personal_info.profile_img personal_info.fullname personal_info.username"
+            },
+            select: "-blog_id -updatedAt"
+        })
+        .select("children")
+        .then(doc => {
+            return res.json({ replies: doc?.children });
+        })
+        .catch((e) => {
+            return res.status(500).json({ message: e, success: false })
+        })
+})
+
+const deleteComment = (_id: Types.ObjectId) => {
+    Comment.findOneAndDelete({ _id })
+        .then((comment) => {
+            if (comment?.parent) {
+                Comment.findOneAndUpdate({ _id: comment.parent },
+                    {
+                        $pull: { children: _id }
+                    }
+                )
+                    .then(data => console.log("comment Deleted"))
+                    .catch(e => console.log(e))
+            }
+            Notification.findOneAndDelete({ comment: _id }).then(not => console.log('comment notification deleted'))
+
+            Notification.findOneAndDelete({ reply: _id }).then(not => console.log('reply notification deleted'))
+
+            Blog.findOneAndUpdate({ _id: comment?.blog_id }, {
+                $pull: { comments: _id },
+                $inc: { "activity.total_comments": -1, "activity.total_parent_comments": comment?.parent ? 0 : -1 }
+            })
+                .then(blog => {
+                    if (comment?.children.length) {
+                        comment.children.map((replies) => {
+                            deleteComment(replies)
+                        })
+                    }
+                })
+        })
+        .catch(e => {
+            console.log("Something wrong has occured", e)
+        })
+}
+router.post('/delete-comment', GetUserMiddleware, (req: Request, res: Response) => {
+    const { id, _id } = req.body
+    console.log(id)
+    Comment.findOne({ _id })
+        .then((comment) => {
+            console.log(comment)
+            if (id == comment?.commented_by || id == comment?.blog_author) {
+                deleteComment(_id)
+            }
+            else {
+                return res.status(403).json({ message: "You are not authorized to delete this comment", success: false })
+            }
         })
 })
 

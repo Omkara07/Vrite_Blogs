@@ -6,6 +6,7 @@ import PageAnimation from '../common/page-animation';
 import CommentCard from './CommentCard.component';
 import NoData from './NoData.component';
 import ProfilePage from '../pages/ProfilePage.page';
+import { Types } from 'mongoose';
 export type commentType = {
     blog_id: string
     blog_author: string
@@ -20,6 +21,8 @@ export type commentType = {
             profile_img: string
         }
     }
+    _id: string
+    isReplyLoaded: boolean
 }
 const CommentSection = () => {
     const { commentSection, setCommentSection, blog: { blog_id, title, comments: { results: commentsArr }, activity: { total_parent_comments } }, blog, setBlog, totalParentComments, setTotalParentComments } = useContext(BlogPageContext)
@@ -28,7 +31,7 @@ const CommentSection = () => {
         let newCommentArr = await fetchComments({ skip: totalParentComments, blog_id, setParentCommentFun: setTotalParentComments, comment_array: commentsArr })
 
         setBlog((prevBlog: blogType) => ({ ...prevBlog, comments: newCommentArr }))
-        console.log(blog)
+        // console.log(blog)
     }
     return (
         <div className={`max-sm:w-full fixed duration-700 max-sm:right-0 sm:top-0 w-[30%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden ${commentSection ? "top-0 sm:right-0" : "top-[100%] sm:right-[-100%]"} font-gelasio`}>
@@ -48,10 +51,8 @@ const CommentSection = () => {
             <div className='flex flex-col gap-5 mt-8 w-full'>
                 {
                     commentsArr && commentsArr.length ?
-                        commentsArr.map((comment: any, i: number) => {
-                            return <PageAnimation key={i} transition={{ duration: 0.7, delay: i * .2 }}>
-                                <CommentCard index={i} leftLev={comment.childrenLevel} commentData={comment} />
-                            </PageAnimation>
+                        commentsArr.map((comment: commentType, i: number) => {
+                            return <CommentCard key={i} index={i} leftLev={comment.childrenLevel} commentData={comment} />
                         })
                         :
                         <NoData message='No comments yet' />
