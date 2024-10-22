@@ -72,19 +72,21 @@ const CommentCard: React.FC<props> = ({ index, leftLev, commentData }) => {
         commentData.isReplyLoaded = false;
         removeCommentCards(index + 1)
     }
-    const loadReplies = ({ skip = 0 }: { skip?: number }) => {
-        if (children.length) {
+    const loadReplies = ({ skip = 0, curIndex = index }: { skip?: number, curIndex?: number }) => {
+
+        if (commentArr[curIndex].children.length) {
             hideReplies()
             axios.post(import.meta.env.VITE_server_url + "/user/get-replies", {
-                _id: id,
+                _id: commentArr[curIndex]._id,
                 skip
             })
                 .then(({ data: { replies } }) => {
-                    commentData.isReplyLoaded = true;
+                    commentArr[curIndex].isReplyLoaded = true;
                     for (let i = 0; i < replies.length; i++) {
-                        replies[i].childrenLevel = commentData.childrenLevel + 1;
-                        commentArr.splice(index + 1 + i + skip, 0, replies[i])
+                        replies[i].childrenLevel = commentArr[curIndex].childrenLevel + 1;
+                        commentArr.splice(curIndex + 1 + i + skip, 0, replies[i])
                     }
+                    console.log(commentArr)
                     setBlog({ ...blog, comments: { ...comments, results: commentArr } })
                 })
                 .catch(e => {
@@ -113,6 +115,28 @@ const CommentCard: React.FC<props> = ({ index, leftLev, commentData }) => {
             })
 
     }
+
+    const LoadMoreReplies = () => {
+        const parentIndex = getParentIndex()
+        if (commentArr[index + 1]) {
+            if (commentArr[index + 1].childrenLevel < commentArr[index].childrenLevel) {
+                if (index - parentIndex < commentArr[parentIndex].children.length)
+                    return (<button className='text-gray-500 py-2 flex items-center px-8 hover:text-black' onClick={() => loadReplies({ skip: index - parentIndex, curIndex: parentIndex })}>
+
+                        Load more replies
+                    </button>
+                    )
+            }
+        }
+        else if (index + 1 === commentArr.length && parentIndex > -1)
+            if (index - parentIndex < commentArr[parentIndex].children.length)
+                return (
+                    <button className='text-gray-500 py-2 flex items-center px-8 hover:text-black' onClick={() => loadReplies({ skip: index - parentIndex, curIndex: parentIndex })}>
+
+                        Load more replies
+                    </button>
+                )
+    }
     return (
         <PageAnimation transition={{ duration: 0.7, delay: index * .1 }}>
 
@@ -122,7 +146,7 @@ const CommentCard: React.FC<props> = ({ index, leftLev, commentData }) => {
                     <p className='capitalize line-clamp-1'>{commented_by_username}</p>
                     <p className='font-light'>{getDays(commentedAt)}</p>
                 </div>
-                <p className='font-gelasio ml-2 py-3'>
+                <p className='font-gelasio text-[15px] ml-2 py-3'>
                     {comment}
                 </p>
                 <div className='flex gap-1 items-center text-gray-500 text-sm'>
@@ -148,8 +172,10 @@ const CommentCard: React.FC<props> = ({ index, leftLev, commentData }) => {
                     isReplying && <CommentField action="reply" replying_to={id} index={index} setReplying={setIsReplying} />
                 }
             </div>
+            <LoadMoreReplies />
         </PageAnimation>
     )
 }
+
 
 export default CommentCard

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTwitter, faFacebook, faInstagram, faYoutube, faGithub } from '@fortawesome/free-brands-svg-icons'; // Import specific icons
+import { faTwitter, faFacebook, faInstagram, faYoutube, faGithub, faXTwitter } from '@fortawesome/free-brands-svg-icons'; // Import specific icons
 import { FaGlobe } from 'react-icons/fa6';
 import { getDate } from '../common/Days';
 
@@ -15,7 +15,7 @@ type Props = {
 const AboutUser: React.FC<Props> = ({ classname, bio, joinedAt, social_links }) => {
     // Mapping brand names to their respective FontAwesome icons
     const iconsMap: { [key: string]: any } = {
-        twitter: faTwitter,
+        twitter: faXTwitter,
         facebook: faFacebook,
         instagram: faInstagram,
         github: faGithub,

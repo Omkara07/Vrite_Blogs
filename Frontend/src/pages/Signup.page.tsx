@@ -98,13 +98,13 @@ const Signup = () => {
             <div>
                 <div className='flex flex-col w-full md:w-[40%] mx-auto justify-center items-center gap-6 mt-8  md:border border-gray-600 border-opacity-5 py-5 px-6 rounded-xl md:shadow-md'>
                     <h1 className='text-4xl font-bold mb-2'>Join Us Today</h1>
-                    <InputBox type="text" placeholder="Name" value="" name="fullname" icon="fi-rr-user" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    <InputBox type="text" placeholder="Name" value={creds.fullname} name="fullname" icon="fi-rr-user" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setCreds({ ...creds, fullname: e.target.value })
                     }} />
-                    <InputBox type="text" placeholder="Email" value="" name="email" icon="fi-rr-envelope" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    <InputBox type="text" placeholder="Email" value={creds.email} name="email" icon="fi-rr-envelope" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setCreds({ ...creds, email: e.target.value })
                     }} />
-                    <InputBox type="password" placeholder="Password" value="" name="password" icon="fi-rr-key" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    <InputBox type="password" placeholder="Password" value={creds.password} name="password" icon="fi-rr-key" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setCreds({ ...creds, password: e.target.value })
                     }} />
                     <BlackBtn value='Create' onClick={handleSubmit} />

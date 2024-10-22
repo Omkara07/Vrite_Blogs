@@ -32,7 +32,8 @@ const Search = () => {
 
     const loadBlogs = async ({ page = 1, create_new_arr = false }) => {
         try {
-            const res = await axios.post(import.meta.env.VITE_server_url + `/user/getBlogs?filter=${debounceval}&page=${page}`, {
+            console.log(debounceval)
+            const res = await axios.post(import.meta.env.VITE_server_url + `/user/getBlogs?filter=${debounceval}&page=${page}`, {}, {
                 headers: {
                     Authorization: "Bearer " + token
                 }
@@ -68,13 +69,20 @@ const Search = () => {
         setUsers(null)
     }
     useEffect(() => {
+        if (!debounceval || !token) {
+            // If there's no debounce value or token, don't make the request yet
+            return;
+        }
         resetState()
         activeTabRef?.current?.click()
         setLoading(true)
-        loadBlogs({ page: 1, create_new_arr: true })
-        loadUsers()
-        setLoading(false)
-    }, [debounceval])
+        const fetchData = async () => {
+            await loadBlogs({ page: 1, create_new_arr: true })
+            await loadUsers()
+            setLoading(false)
+        }
+        fetchData()
+    }, [debounceval, token])
     console.log(blogs)
     return (
         <div className="h-cover w-full">

@@ -352,8 +352,6 @@ router.post("/getBlogs", GetUserMiddleware, async (req: Request, res: Response) 
     const page: number = parseInt(req.query.page as string)
     const tags: string[] = req.body.tags
     const eliminate_blog = req.query.eliminate_blog as string
-    // console.log(tags, eliminate_blog)
-
     let filterOb: any = { draft: false }
     if (!filter && !tags) {
         return res.json({
@@ -649,6 +647,7 @@ router.post("/get-replies", async (req: Request, res: Response) => {
             select: "-blog_id -updatedAt"
         })
         .select("children")
+        .sort({ commentedAt: -1 })
         .then(doc => {
             return res.json({ replies: doc?.children });
         })
@@ -701,6 +700,102 @@ router.post('/delete-comment', GetUserMiddleware, (req: Request, res: Response) 
             else {
                 return res.status(403).json({ message: "You are not authorized to delete this comment", success: false })
             }
+        })
+})
+
+router.post('/change-password', GetUserMiddleware, (req: Request, res: Response) => {
+    const { curPassword, newPassword, id } = req.body
+    User.findOne({ _id: id })
+        .then((user) => {
+            if (!user) {
+                return res.status(403).json({ message: "User not found", success: false })
+            }
+            if (user?.google_auth) {
+                return res.status(403).json({ message: "User was loggedin using google, cannot change password" })
+            }
+            bcrypt.compare(curPassword, user?.personal_info?.password as string, (err, result) => {
+                if (err) {
+                    return res.status(500).json({ message: err, success: false })
+                }
+                if (!result) {
+                    return res.status(403).json({ message: "Incorrect Password", success: false });
+                }
+                bcrypt.hash(newPassword, 11, (err, hashedPassword) => {
+                    if (err) {
+                        return res.status(500).json({ message: err, success: false })
+                    }
+                    User.findOneAndUpdate({ _id: id }, {
+                        "personal_info.password": hashedPassword
+                    })
+                        .then((u) => {
+                            return res.json({ message: "Password changed successfully", success: true })
+                        })
+                        .catch((err) => {
+                            return res.status(500).json({ message: err, success: false })
+                        })
+                })
+            })
+        })
+        .catch(e => {
+            return res.status(500).json({ message: 'something went wrong', success: false });
+        })
+})
+
+router.post("/update-profile-img", GetUserMiddleware, (req: Request, res: Response) => {
+    const { id, url } = req.body;
+    User.findOneAndUpdate({ _id: id }, {
+        "personal_info.profile_img": url
+    })
+        .then((data) => {
+            return res.json({ profile_img: url })
+        })
+        .catch((e) => {
+            return res.status(500).json({ message: "Something went wrong!", success: false })
+        })
+})
+
+router.post("/update-profile", GetUserMiddleware, (req: Request, res: Response) => {
+    const { id, username, bio, social_links } = req.body;
+    const bioLimit = 150;
+    if (bio.length > bioLimit) {
+        return res.status(403).json({ message: `Bio must be atmost ${bioLimit} characters long.`, success: false });
+    }
+    if (username.length < 3) {
+        return res.status(403).json({ message: "Username must be at least 3 characters long.", success: false })
+    }
+    let socialLinksArr = Object.keys(social_links)
+    try {
+        for (let i = 0; i < socialLinksArr.length; i++) {
+            if (social_links[socialLinksArr[i]].length) {
+                let hostname = new URL(social_links[socialLinksArr[i]]).hostname;
+                console.log(hostname)
+                if ((!hostname.includes(`${socialLinksArr[i]}.com`) && socialLinksArr[i] != 'twitter') && socialLinksArr[i] !== 'website') {
+                    return res.status(403).json({ message: `Invalid ${socialLinksArr[i]} link`, success: false });
+                }
+            }
+        }
+    }
+    catch (e) {
+        return res.status(500).json({ message: "You  have entered an invalid link.(Provide full links with http(s))", success: false })
+
+    }
+    let updatedObj = {
+        "personal_info.username": username,
+        "personal_info.bio": bio,
+        social_links
+    }
+    User.findOneAndUpdate({ _id: id }, updatedObj, {
+        // to deal with the duplicate usernames
+        runValidators: true
+    })
+        .then(() => {
+            return res.json({ username })
+        })
+        .catch((err) => {
+            if (err.code == 11000) {
+                return res.status(409).json({ message: "Username is already taken" })
+            }
+            else return res.status(500).json({ message: err.message })
         })
 })
 

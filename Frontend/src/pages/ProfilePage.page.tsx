@@ -14,7 +14,7 @@ import LoadMoreDataBtn from '../components/LoadMoreDataBtn.component'
 import NotFound404 from './404.page'
 import { userNavRef } from '../components/navbar.component'
 
-type userType = {
+export type userType = {
     personal_info: {
         fullname: string,
         email: string,
@@ -31,7 +31,7 @@ type userType = {
     _id: string
 }
 
-const defaultUser = {
+export const defaultUser = {
     personal_info: {
         fullname: "",
         email: "",
@@ -147,7 +147,7 @@ const ProfilePage = () => {
                                         <div className='flex gap-4 mt-2'>
                                             {
                                                 profileId === username ?
-                                                    <Link to='settings/edit-profile' className='py-1.5 px-3 rounded-lg bg-gray-200' >
+                                                    <Link to='/settings/edit-profile' className='py-1.5 px-3 rounded-lg bg-gray-200' >
                                                         Edit Profile
                                                     </Link>
                                                     : ""

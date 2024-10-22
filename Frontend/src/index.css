@@ -41,3 +41,13 @@
       background-position: 200% 0%;
     }
   }
+
+  @layer components{
+    .sidebar-link{
+      @apply flex gap-4 items-center py-4 text-gray-500 hover:text-black;
+    }
+    
+    .sidebar-link.active{
+      @apply text-black border-r-2 border-black pl-6 bg-gray-300/50 -ml-6 md:rounded-tl-lg md:rounded-bl-lg max-md:border-none;
+    }
+  }

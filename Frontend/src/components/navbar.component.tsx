@@ -30,7 +30,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className='flex h-16 px-4 items-center justify-between shadow-sm font-sans'>
+            <nav className=' z-40 sticky top-0 flex items-center gap-12 w-full px-[5vw] py-5 h-[75px] max-md:h-[68px] shadow-sm border-b border-grey bg-white'>
                 <div className='flex w-full'>
                     <Link to="/" className='flex items-center'>
                         <IoLogoVimeo className='text-[35px]' />
@@ -59,11 +59,11 @@ const Navbar = () => {
                                 onBlur={handleBlur}
                                 // this will prevent the userNav panel from closing on the clicks inside of the panel
                                 onMouseDown={handleOnMouseDown}>
-                                <button className='flex w-8  border-black border-2 rounded-full md:mr-2' onClick={() => {
+                                <button className='flex w-8 h-8  border-black border-2 rounded-full md:mr-2' onClick={() => {
                                     // console.log(userAuth.profile_img)
                                     setUserNav(prev => !prev)
                                 }}>
-                                    <img src={userAuth.profile_img} className='rounded-full' />
+                                    <img src={userAuth.profile_img} className='rounded-full h-full w-full' />
                                 </button>
                                 {openUserNav && <User_Navigation username={userAuth.username} setUserNav={setUserNav} />}
                             </div>

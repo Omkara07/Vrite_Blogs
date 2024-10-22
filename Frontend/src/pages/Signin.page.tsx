@@ -26,8 +26,8 @@ const Signin = () => {
         if (!passwordRegex.test(creds.password)) {
             return toast.error("Invalid Password")
         }
-        if (creds.password.length < 8) {
-            return toast.error("Password must be of minimum lenght 8")
+        if (creds.password.length < 6) {
+            return toast.error("Password must be of minimum lenght 6")
         }
 
         try {
@@ -94,10 +94,10 @@ const Signin = () => {
             <Toaster richColors />
             <div className='flex flex-col w-full md:w-[40%] mx-auto justify-center items-center gap-6 mt-8 md:mt-10 md:border border-gray-600 border-opacity-5 py-10 px-6 rounded-xl md:shadow-md'>
                 <h1 className='text-4xl font-bold mb-10'>Welcome Back</h1>
-                <InputBox type="text" placeholder="Email" value="" name="email" icon="fi-rr-envelope" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                <InputBox type="text" placeholder="Email" value={creds.email} name="email" icon="fi-rr-envelope" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setCreds({ ...creds, email: e.target.value })
                 }} />
-                <InputBox type="password" placeholder="Password" value="" name="password" icon="fi-rr-key" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                <InputBox type="password" placeholder="Password" value={creds.password} name="password" icon="fi-rr-key" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setCreds({ ...creds, password: e.target.value })
                 }} />
                 <BlackBtn value='Login' onClick={handleSubmit} />

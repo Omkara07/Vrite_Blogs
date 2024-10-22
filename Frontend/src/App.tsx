@@ -1,5 +1,6 @@
 // import React from 'react'
 import './index.css'
+import 'react-image-crop/dist/ReactCrop.css'
 import Home from './pages/home.page.tsx'
 import Signin from './pages/Signin.page.tsx'
 import Signup from './pages/Signup.page.tsx'
@@ -12,6 +13,9 @@ import Search from './pages/Search.page.tsx';
 import NotFound404 from './pages/404.page.tsx';
 import ProfilePage from './pages/ProfilePage.page.tsx';
 import BlogPage from './pages/BlogPage.page.tsx';
+import SideNav from './components/SideNav.component.tsx';
+import ChangePassword from './pages/ChangePassword.page.tsx';
+import EditProfile from './pages/EditProfile.page.tsx';
 
 type userType = {
   email: string,
@@ -29,10 +33,10 @@ function App() {
   useEffect(() => {
     const f = async () => {
       if (userr) {
-        const parsedUser = JSON.parse(userr);
-        await setUserAuth(parsedUser);
+        const parsedUser = await JSON.parse(userr);
+        setUserAuth(parsedUser);
+        setLoading(false)
       }
-      setLoading(false)
     }
     f()
   }, [userr])
@@ -59,6 +63,10 @@ function App() {
           <Route path='signup' element={<Signup />} />
           <Route path='search' element={<Search />} />
           <Route path='user/:id' element={<ProfilePage />} />
+          <Route path='settings' element={<SideNav />}>
+            <Route path='edit-profile' element={<EditProfile />}></Route>
+            <Route path='change-password' element={<ChangePassword />}></Route>
+          </Route>
           <Route path='blog/:blog_id' element={<BlogPage />} />
           <Route path='*' element={<NotFound404 />} />
         </Route>
