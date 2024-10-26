@@ -38,6 +38,9 @@ const BlogCard: React.FC<blogs> = ({ blog: { blog_id, title, des, banner, activi
     return (
         <Link to={`/blog/${blog_id}`} className='pl-6 md:pl-0 flex w-full items-center gap-6 justify-between max-md:p-4 border-b pb-2'>
             <div className='flex flex-col gap-2 md:text-sm text-[12px]'>
+                <div className='md:hidden mb-2 w-full md:h-28 md:w-48 aspect-video bg-gray-300 rounded-xl'>
+                    <img src={banner} alt="blog banner" className='w-full h-full aspect-video rounded-xl object' />
+                </div>
                 <div className='flex gap-2 items-center font-gelasio text-[12px]'>
                     <img className='w-6 rounded-full' src={profile_img} alt="" />
                     <p className='capitalize line-clamp-1'>{fullname} <span className='font-semibold'>@{username}</span></p>
@@ -58,7 +61,7 @@ const BlogCard: React.FC<blogs> = ({ blog: { blog_id, title, des, banner, activi
                 </div>
                 <p className='min-w-fit text-gray-500 font-gelasio mt-2'>{getDays(publishedAt)}</p>
             </div>
-            <div className='h-20 w-28 md:h-28 md:w-48 aspect-video bg-gray-300 rounded-xl'>
+            <div className='max-md:hidden h-20 w-28 md:h-28 md:w-48 aspect-video bg-gray-300 rounded-xl'>
                 <img src={banner} alt="blog banner" className='w-full h-full aspect-video rounded-xl object' />
             </div>
         </Link>

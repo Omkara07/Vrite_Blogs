@@ -38,7 +38,7 @@ const User_Navigation: React.FC<Props> = ({ username, setUserNav }) => {
                 <button className='flex justify-center items-center hover:bg-gray-800 flex-col w-full rounded-b-xl hover:rounded-t-xl bg-black text-white py-1 pb-2' onClick={() => {
                     localStorage.removeItem("userAuth")
                     setUserNav(false)
-                    setUserAuth(null)
+                    setUserAuth({ email: "", username: "", profile_img: "", token: "", new_notifications: false })
                     toast.success("User Logged out")
                     navigate("/signin")
                 }}>

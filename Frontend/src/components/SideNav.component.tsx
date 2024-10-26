@@ -12,7 +12,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 
 const SideNav = () => {
     const page = location.pathname.split('/')[2]
-    const { userAuth: { token } } = useContext(AuthContext)
+    const { userAuth: { token, new_notifications } } = useContext(AuthContext)
     const [pageState, setPageState] = useState<string>(page.replace('-', ' '))
     const [showSidenav, setShowSidenav] = useState<boolean>(false);
 
@@ -65,8 +65,11 @@ const SideNav = () => {
                                 <TiDocumentText />
                                 Blogs
                             </NavLink>
-                            <NavLink to='/dashboard/notification' onClick={() => setPageState('notification')} className='sidebar-link '>
-                                <FaBell />
+                            <NavLink to='/dashboard/notifications' onClick={() => setPageState('notification')} className='sidebar-link '>
+                                <div className='relative flex items-center'>
+                                    <button><FaBell /></button>
+                                    {new_notifications ? <span className='absolute z-10 -top-1 -right-1 bg-red-500 h-2 w-2 rounded-full duration-300 animate-pop'></span> : ""}
+                                </div>
                                 Notification
                             </NavLink>
                             <NavLink to='/editor' onClick={() => setPageState('editor')} className='sidebar-link '>

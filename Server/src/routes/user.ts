@@ -298,7 +298,7 @@ router.get("/latest-blogs", GetUserMiddleware, (req: Request, res: Response) => 
         })
 })
 
-router.get("/all-latest-blogs-count", (req: Request, res: Response) => {
+router.post("/all-latest-blogs-count", (req: Request, res: Response) => {
     const filter: string = req.query.filter as string
     const id: string = req.query.id as string
     let filterOb: any = { draft: false }
@@ -317,7 +317,7 @@ router.get("/all-latest-blogs-count", (req: Request, res: Response) => {
         })
 })
 
-router.get("/all-search-blogs-count", (req: Request, res: Response) => {
+router.post("/all-search-blogs-count", (req: Request, res: Response) => {
     const filter: string = req.query.filter as string
 
     Blog.countDocuments({
@@ -535,7 +535,7 @@ router.post("/is-blog-liked", GetUserMiddleware, (req: Request, res: Response) =
 })
 
 router.post("/add-comment", GetUserMiddleware, async (req: Request, res: Response) => {
-    let { blog_id, comment, replying_to, id } = req.body
+    let { blog_id, comment, replying_to, id, notification_id } = req.body
     console.log(replying_to)
 
     if (!comment.length) {
@@ -594,6 +594,12 @@ router.post("/add-comment", GetUserMiddleware, async (req: Request, res: Respons
                                         notifiObj.notification_for = replyingToCommentDoc?.commented_by!
                                     }
                                 })
+
+                            if (notification_id) {
+                                Notification.findOneAndUpdate({ _id: notification_id }, { reply: commentFile._id })
+                                    .then((noti) => console.log("notification updated"))
+                                    .catch((e) => console.log(e))
+                            }
                         }
                         Notification.create(notifiObj)
                             .then((not) => {
@@ -656,9 +662,9 @@ router.post("/get-replies", async (req: Request, res: Response) => {
         })
 })
 
-const deleteComment = (_id: Types.ObjectId) => {
+const deleteComment = async (_id: Types.ObjectId) => {
     Comment.findOneAndDelete({ _id })
-        .then((comment) => {
+        .then(async (comment) => {
             if (comment?.parent) {
                 Comment.findOneAndUpdate({ _id: comment.parent },
                     {
@@ -668,9 +674,9 @@ const deleteComment = (_id: Types.ObjectId) => {
                     .then(data => console.log("comment Deleted"))
                     .catch(e => console.log(e))
             }
-            Notification.findOneAndDelete({ comment: _id }).then(not => console.log('comment notification deleted'))
+            await Notification.findOneAndDelete({ comment: _id }).then(not => console.log('comment notification deleted'))
 
-            Notification.findOneAndDelete({ reply: _id }).then(not => console.log('reply notification deleted'))
+            await Notification.findOneAndUpdate({ reply: _id }, { $unset: { reply: 1 } }).then(not => console.log('reply notification deleted'))
 
             Blog.findOneAndUpdate({ _id: comment?.blog_id }, {
                 $pull: { comments: _id },
@@ -690,12 +696,13 @@ const deleteComment = (_id: Types.ObjectId) => {
 }
 router.post('/delete-comment', GetUserMiddleware, (req: Request, res: Response) => {
     const { id, _id } = req.body
-    console.log(id)
+    console.log(id, _id)
     Comment.findOne({ _id })
-        .then((comment) => {
+        .then(async (comment) => {
             console.log(comment)
             if (id == comment?.commented_by || id == comment?.blog_author) {
-                deleteComment(_id)
+                await deleteComment(_id)
+                return res.json({ success: true, message: "Deleted successfully" })
             }
             else {
                 return res.status(403).json({ message: "You are not authorized to delete this comment", success: false })
@@ -799,6 +806,74 @@ router.post("/update-profile", GetUserMiddleware, (req: Request, res: Response) 
         })
 })
 
+router.get('/new-notifications', GetUserMiddleware, (req: Request, res: Response) => {
+    const { id } = req.body
+    Notification.exists({ notification_for: id, seen: false, user: { $ne: id } })
+        .then((result) => {
+            if (result) {
+                return res.json({ success: true, new_notifications: true })
+            }
+            else {
+                return res.json({ message: false, new_notifications: false })
+            }
+        })
+        .catch((e) => {
+            return res.status(500).json({ message: e.message })
+
+        })
+})
+
+router.post('/notifications', GetUserMiddleware, (req: Request, res: Response) => {
+    const { id, filter, page, deletedDocs } = req.body
+
+    const maxLimit = 10;
+    let skipDocs = (page - 1) * maxLimit;
+    let findQuery: any = { notification_for: id, user: { $ne: id } }
+    if (filter !== 'all') {
+        findQuery = { ...findQuery, type: filter }
+    }
+    if (deletedDocs) {
+        skipDocs -= deletedDocs
+    }
+
+    Notification.find(findQuery)
+        .skip(skipDocs)
+        .limit(maxLimit)
+        .populate("blog", "blog_id title")
+        .populate("user", "personal_info.username personal_info.fullname personal_info.profile_img")
+        .populate("comment", "comment")
+        .populate("replied_on_comment", "comment")
+        .populate("reply", "comment")
+        .sort({ createdAt: -1 })
+        .select("createdAt type seen reply")
+        .then(async (notifications) => {
+            await Notification.updateMany(findQuery, { seen: true })
+                .skip(skipDocs)
+                .limit(maxLimit)
+            return res.json({ success: true, notifications: notifications })
+        })
+        .catch((e) => {
+            return res.status(500).json({ message: e.message, success: false })
+        })
+})
+
+router.post('/all-notifications-count', GetUserMiddleware, (req: Request, res: Response) => {
+    const { id, filter } = req.body
+
+    let findQuery: any = { notification_for: id, user: { $ne: id } }
+    if (filter !== 'all') {
+        findQuery = { ...findQuery, type: filter }
+    }
+
+    Notification.countDocuments(findQuery)
+        .then((count) => {
+            return res.json({ success: true, totalDocs: count })
+        })
+        .catch((e) => {
+            return res.status(500).json({ message: e.message, success: false })
+        })
+})
+
 router.get("/trending-blogs", GetUserMiddleware, (req: Request, res: Response) => {
     Blog.find({ draft: false })
         .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
@@ -897,6 +972,64 @@ router.post('/create-blog', GetUserMiddleware, async (req: Request, res: Respons
             })
         }
     }
+})
+
+router.post('/written-blogs', GetUserMiddleware, (req: Request, res: Response) => {
+    const { id, page, draft, query, deletedDocs } = req.body
+    let maxLimit = 5;
+    let skipDoc = (page - 1) * maxLimit;
+    if (deletedDocs) {
+        skipDoc -= deletedDocs
+    }
+
+    Blog.find({ author: id, draft, title: { "$regex": query } })
+        .skip(skipDoc)
+        .limit(maxLimit)
+        .sort({ publishedAt: -1 })
+        .select("title banner des draft publishedAt activity blog_id -_id")
+        .then((blogs) => {
+            return res.json({ blogs, success: true })
+        })
+        .catch((e) => {
+            return res.status(500).json({ message: e.message, success: false })
+        })
+})
+
+router.post('/written-blogs-count', GetUserMiddleware, (req: Request, res: Response) => {
+    const { id, draft, query } = req.body
+    Blog.countDocuments({ author: id, draft, title: { $regex: query } })
+        .then((totalDocs) => {
+            return res.json({ totalDocs, success: true })
+        })
+        .catch((e) => {
+            return res.status(500).json({ message: e.message, success: false })
+        })
+})
+
+router.post("/delete-blog", GetUserMiddleware, (req: Request, res: Response) => {
+    const { id, blog_id } = req.body
+
+    Blog.findOneAndDelete({ blog_id })
+        .then((blog) => {
+            if (blog) {
+                const reads = blog.activity?.total_reads || 0;
+                Notification.deleteMany({ blog: blog._id }).then(() => console.log("notifications deleted"))
+
+                Comment.deleteMany({ blog_id: blog._id }).then(() => console.log("comments deleted"))
+
+                User.findOneAndUpdate({ _id: id }, {
+                    $pull: { blogs: blog._id },
+                    $inc: { "account_info.total_posts": -1, "account_info.total_reads": -reads }
+                })
+                    .then(() => console.log("blog deleted"))
+
+                return res.status(200).json({ message: "blog deleted", success: true })
+            }
+            else return res.status(500).json({ message: "something went wrong", success: false })
+        })
+        .catch((e) => {
+            return res.status(500).json({ message: e.message, success: false })
+        })
 })
 
 export default router

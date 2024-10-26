@@ -4,7 +4,7 @@ import 'react-image-crop/dist/ReactCrop.css'
 import Home from './pages/home.page.tsx'
 import Signin from './pages/Signin.page.tsx'
 import Signup from './pages/Signup.page.tsx'
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet, useNavigate } from "react-router-dom";
 import { createContext, useEffect, useState } from 'react';
 import Navbar from './components/navbar.component.tsx';
 import Editor from './pages/Editor.page.tsx';
@@ -16,19 +16,23 @@ import BlogPage from './pages/BlogPage.page.tsx';
 import SideNav from './components/SideNav.component.tsx';
 import ChangePassword from './pages/ChangePassword.page.tsx';
 import EditProfile from './pages/EditProfile.page.tsx';
+import Notifications from './pages/Notifications.page.tsx'
+import BlogManagement from './pages/BlogManagement.page.tsx'
 
 type userType = {
   email: string,
   username: string
   profile_img: string
   token: string
+  new_notifications?: boolean
 }
 export const AuthContext = createContext<any>({});
 function App() {
   const userr = localStorage.getItem("userAuth");
-  const [userAuth, setUserAuth] = useState<userType>({ email: "", username: "", profile_img: "", token: "" })
+  const [userAuth, setUserAuth] = useState<userType>({ email: "", username: "", profile_img: "", token: "", new_notifications: false })
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>("")
+  const navigate = useNavigate()
 
   useEffect(() => {
     const f = async () => {
@@ -36,6 +40,10 @@ function App() {
         const parsedUser = await JSON.parse(userr);
         setUserAuth(parsedUser);
         setLoading(false)
+      }
+      else {
+        setLoading(false)
+        navigate('/signin')
       }
     }
     f()
@@ -63,6 +71,10 @@ function App() {
           <Route path='signup' element={<Signup />} />
           <Route path='search' element={<Search />} />
           <Route path='user/:id' element={<ProfilePage />} />
+          <Route path='dashboard' element={<SideNav />}>
+            <Route path='notifications' element={<Notifications />}></Route>
+            <Route path='blogs' element={<BlogManagement />}></Route>
+          </Route>
           <Route path='settings' element={<SideNav />}>
             <Route path='edit-profile' element={<EditProfile />}></Route>
             <Route path='change-password' element={<ChangePassword />}></Route>

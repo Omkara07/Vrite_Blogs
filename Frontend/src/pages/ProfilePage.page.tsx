@@ -147,7 +147,7 @@ const ProfilePage = () => {
                                         <div className='flex gap-4 mt-2'>
                                             {
                                                 profileId === username ?
-                                                    <Link to='/settings/edit-profile' className='py-1.5 px-3 rounded-lg bg-gray-200' >
+                                                    <Link to="/settings/edit-profile" className='py-1.5 px-3 rounded-lg bg-gray-200' >
                                                         Edit Profile
                                                     </Link>
                                                     : ""

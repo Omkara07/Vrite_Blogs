@@ -7,22 +7,29 @@ type Props = {
     page: any
     counteRoute: any
     token: string
+    data_to_send?: any
+
 }
 
-export const filterPaginationData = async ({ create_new_arr = false, state, data, page, counteRoute, token }: Props): Promise<latestBlogType> => {
+export const filterPaginationData = async ({ create_new_arr = false, data_to_send, state, data, page, counteRoute, token }: Props): Promise<latestBlogType> => {
 
     let obj;
 
+    let bodyData = {};
+    if (data_to_send) {
+        bodyData = data_to_send
+    }
     if (!create_new_arr && state != null) {
         obj = { ...state, results: [...state.results, ...data], page: page }
     }
     else {
-        await axios.get(import.meta.env.VITE_server_url + counteRoute, {
+        await axios.post(import.meta.env.VITE_server_url + counteRoute, data_to_send, {
             headers: {
                 Authorization: "Bearer " + token
             }
         })
             .then(({ data: { totalDocs } }) => {
+                console.log(totalDocs)
                 obj = { results: data, page: 1, totalBlogs: totalDocs }
             })
             .catch(err => {

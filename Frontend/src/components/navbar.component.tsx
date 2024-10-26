@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { IoMdSearch, IoLogoVimeo } from "react-icons/io";
 import { MdEditDocument } from "react-icons/md";
 import "../index.css"
@@ -6,12 +6,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaBell } from "react-icons/fa6";
 import User_Navigation from './User-navigation.component';
 import { AuthContext } from '../App';
+import axios from 'axios';
 
 export let userNavRef: React.MutableRefObject<HTMLDivElement | null>
 
 const Navbar = () => {
     const [search, setSearch] = useState<boolean>(false);
-    const { userAuth, filter, setFilter } = useContext(AuthContext)
+    const { userAuth, userAuth: { token, new_notifications }, filter, setFilter, setUserAuth } = useContext(AuthContext)
     const [openUserNav, setUserNav] = useState<boolean>(false)
     userNavRef = useRef<HTMLDivElement | null>(null)
     const navigate = useNavigate()
@@ -27,6 +28,23 @@ const Navbar = () => {
     const handleOnMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation()
     }
+
+    useEffect(() => {
+        if (token) {
+            axios.get(import.meta.env.VITE_server_url + '/user/new-notifications', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+                .then(({ data }) => {
+                    console.log(data)
+                    setUserAuth({ ...userAuth, new_notifications: data.new_notifications })
+                })
+                .catch((e) => {
+                    console.log(e)
+                })
+        }
+    }, [token])
 
     return (
         <>
@@ -51,9 +69,12 @@ const Navbar = () => {
                     <button className="md:hidden flex items-center" onClick={() => setSearch(prev => !prev)}>
                         <IoMdSearch className="flex text-xl focus:text-black" />
                     </button>
-                    {userAuth ?
+                    {userAuth && userAuth.username.length ?
                         <div className='flex gap-4 md:gap-12 ml-6'>
-                            <button><FaBell className='flex hover:text-lg duration-150 z-30 ' /></button>
+                            <Link to='/dashboard/notifications' className='relative flex items-center'>
+                                <button><FaBell /></button>
+                                {new_notifications ? <span className='absolute z-10 top-1 -right-1 bg-red-500 h-2 w-2 rounded-full duration-300 animate-pop'></span> : ""}
+                            </Link>
                             <div className='flex' ref={userNavRef}
                                 // this will close the userNav panel on clicking outside of it 
                                 onBlur={handleBlur}

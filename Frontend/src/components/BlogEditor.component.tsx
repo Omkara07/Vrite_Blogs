@@ -126,7 +126,7 @@ const BlogEditor = memo(() => {
           toast.dismiss(blogToast)
           toast.success("Draft saved successfully!")
           setTimeout(() => {
-            navigate("/")
+            navigate("/dashboard/blogs?tag=draft")
           }, 500);
         })
           .catch(({ res }) => {

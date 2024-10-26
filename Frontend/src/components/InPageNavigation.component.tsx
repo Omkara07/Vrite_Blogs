@@ -5,14 +5,14 @@ import PageAnimation from '../common/page-animation';
 type props = {
     routes: string[],
     inPageNavIndex?: number,
-    defaultHidden: string[],
+    defaultHidden?: string[],
     children: React.ReactNode
     cap?: boolean
 }
 
 export let activeTabLineRef: React.MutableRefObject<HTMLHRElement | null>;
 export let activeTabRef: React.MutableRefObject<HTMLButtonElement | null>
-const InPageNavigation: React.FC<props> = ({ routes, defaultHidden, inPageNavIndex = 0, children, cap = true }) => {
+const InPageNavigation: React.FC<props> = ({ routes, defaultHidden = "", inPageNavIndex = 0, children, cap = true }) => {
     activeTabLineRef = useRef<HTMLHRElement | null>(null);
     activeTabRef = useRef<HTMLButtonElement | null>(null)
     const [activeRoute, setActiveRoute] = React.useState<number>(0)
