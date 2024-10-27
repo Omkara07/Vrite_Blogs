@@ -12,7 +12,7 @@ app.use((req, res, next) => {
     next();
 });
 const corsOptions = {
-    origin: 'https://vrite-five.vercel.app', // Allow requests only from your Vercel app
+    origin: true, // Allow requests only from your Vercel app
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Add other methods as needed
     credentials: true // If your API requires credentials (cookies, HTTP auth)
 };
