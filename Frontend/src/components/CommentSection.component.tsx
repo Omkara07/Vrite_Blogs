@@ -34,7 +34,7 @@ const CommentSection = () => {
         // console.log(blog)
     }
     return (
-        <div className={`max-md:w-full max-md:ml-5 fixed duration-700 max-sm:right-0 sm:top-0 w-[30%] min-w-[420px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden ${commentSection ? "top-0 sm:right-0" : "top-[100%] sm:right-[-100%]"} font-gelasio`}>
+        <div className={`max-md:w-full fixed duration-700 max-sm:right-0 sm:top-0 w-[30%] min-w-[380px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden ${commentSection ? "top-0 sm:right-0" : "top-[100%] sm:right-[-100%]"} font-gelasio`}>
 
             <div>
                 <h1 className='text-xl font-semibold leading-5'>Comments</h1>
