@@ -1032,4 +1032,8 @@ router.post("/delete-blog", GetUserMiddleware, (req: Request, res: Response) => 
         })
 })
 
+router.get('hello', (req: Request, res: Response) => {
+    return res.json({ message: "hello betch" })
+})
+
 export default router
