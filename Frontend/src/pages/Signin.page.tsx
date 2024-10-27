@@ -107,7 +107,7 @@ const Signin = () => {
                     <hr className='flex w-1/2 ' />
                 </div>
                 <div className='flex w-full justify-center items-center -translate-x-5 gap-1 md:gap-0'>
-                    <FcGoogle className='relative translate-x-24 text-xl w-10 z-30 ' />
+                    <FcGoogle className='max-md:translate-x-12 relative translate-x-24 text-xl w-10 z-30 ' />
                     <BlackBtn value="Continue with Google" onClick={handleGoogleAuth} />
                 </div>
                 <div className='text-gray-500'>Don't have an account ? <Link to='/signup' className='underline text-black'>Create Account</Link></div>
