@@ -12,9 +12,15 @@ import PageAnimation from '../common/page-animation'
 import LoadMoreDataBtn from '../components/LoadMoreDataBtn.component'
 import { useSearchParams } from 'react-router-dom'
 
+type blogsType = {
+    results: any[]
+    totalBlogs: number
+    deletedDocs?: number
+    page: number
+}
 const BlogManagement = () => {
-    const [blogs, setBlogs] = useState<any>(null)
-    const [drafts, setDrafts] = useState<any>(null)
+    const [blogs, setBlogs] = useState<blogsType | null>(null)
+    const [drafts, setDrafts] = useState<blogsType | any>(null)
     const [query, setQuery] = useState<string>("")
     const { userAuth: { token } } = useContext(AuthContext)
     const debounceVal = useDebounce(query)
@@ -95,14 +101,13 @@ const BlogManagement = () => {
                             <div className='flex flex-col gap-8'>{
                                 blogs.results.length ?
                                     <>{
-
                                         blogs.results.map((blog: any, i: number) => {
                                             return <PageAnimation key={i} transition={{ delay: i * 0.2 }}>
                                                 <ManageBlogCard blog={blog} index={i} stateFunc={setBlogs} />
                                             </PageAnimation>
                                         })
                                     }
-                                        < LoadMoreDataBtn state={blogs} fetchDataFunc={getBlogs} additionalParams={{ deletedDocs: blogs.deletedDocs, draft: false }} />
+                                        < LoadMoreDataBtn state={blogs} fetchDataFunc={getBlogs} additionalParams={{ deletedDocs: blogs.deletedDocs ? blogs.deletedDocs : 0, draft: false }} />
                                     </>
                                     :
                                     <div className='mx-auto'>
@@ -137,7 +142,7 @@ const BlogManagement = () => {
                                             </PageAnimation>
                                         })
                                     }
-                                    < LoadMoreDataBtn state={drafts} fetchDataFunc={getBlogs} additionalParams={{ deletedDocs: blogs.deletedDocs, draft: true }} />
+                                    < LoadMoreDataBtn state={drafts} fetchDataFunc={getBlogs} additionalParams={{ deletedDocs: drafts.deletedDocs ? drafts.deletedDocs : 0, draft: true }} />
                                 </>
                                 :
                                 <div className='mx-auto'>

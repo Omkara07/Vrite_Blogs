@@ -105,8 +105,8 @@ const Navbar = () => {
                     }
                 </div>
             </nav >
-            <div className={`md:hidden transition-all duration-500 ease-in-out ${search ? 'max-h-[100px] opacity-100' : 'max-h-0 opacity-0'} flex w-auto items-center focus-within:text-black z-3`}>
-                <input type="text" placeholder="Search" className="md:flex ml-12 w-[80%] bg-gray-100 p-2 rounded-xl " onClick={() => navigate('/search')} onChange={(e) => setFilter(e.target.value)} />
+            <div className={`md:hidden mt-3 transition-all duration-500 ease-in-out ${search ? 'max-h-[100px] opacity-100' : 'max-h-0 opacity-0'} flex w-auto items-center focus-within:text-black z-3`}>
+                <input type="text" placeholder="Search" className="md:flex ml-9 w-[80%] bg-gray-100 p-2 rounded-xl " onClick={() => navigate('/search')} onChange={(e) => setFilter(e.target.value)} />
                 <IoMdSearch className="flex ml-[-25px] text-gray-500 text-xl focus:text-black" />
             </div>
         </>

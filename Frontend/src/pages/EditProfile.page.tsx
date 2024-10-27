@@ -159,13 +159,13 @@ const EditProfile = () => {
 
                             <button className='px-4 py-2 rounded-full max-lg:center w-32 hover:bg-gray-700 bg-black text-white font-semibold' onClick={handleImgUpload}>Upload</button>
                         </div>
-                        <div className='flex flex-col w-full gap-5 max-md:items-center'>
+                        <div className='flex flex-col w-full gap-5'>
                             <div className='flex max-md:flex-col gap-5 md:w-[70%] w-full items-center'>
-                                <InputBox type='text' value={fullname} name='fullname' placeholder='fullname' disabled={true} icon='fi-rr-user' />
-                                <InputBox type='text' value={email} name='email' placeholder='email' disabled={true} icon='fi-rr-envelope' />
+                                <InputBox type='text' value={fullname} wid='[80%]' name='fullname' placeholder='fullname' disabled={true} icon='fi-rr-user' />
+                                <InputBox type='text' value={email} wid='[80%]' name='email' placeholder='email' disabled={true} icon='fi-rr-envelope' />
                             </div>
                             <div className='flex flex-col w-full max-md:items-center gap-5'>
-                                <InputBox type='text' value={profile_username} name='username' placeholder='username' icon='fi-rr-at' onChange={(e) => {
+                                <InputBox type='text' value={profile_username} wid='[80%]' name='username' placeholder='username' icon='fi-rr-at' onChange={(e) => {
                                     setProfile(prev => ({
                                         ...prev,
                                         personal_info: {
@@ -174,7 +174,7 @@ const EditProfile = () => {
                                         }
                                     }))
                                 }} />
-                                <p className='text-[12px] text-gray-400 -mt-4 mx-5'>Username will be used to search user and will be visible to all.</p>
+                                <p className='flex text-[11px] text-gray-400 -mt-4 max-sm:pl-2'>Username will be used to search user and will be visible to all.</p>
                                 <textarea maxLength={200} defaultValue={bio} onChange={(e) => {
                                     setBioLen(e.target.value.length)
                                     setProfile(prev => ({
@@ -184,19 +184,19 @@ const EditProfile = () => {
                                             bio: e.target.value
                                         }
                                     }))
-                                }} className='w-[70%] h-40 rounded-xl bg-[#f2f2f2] resize-none px-4 leading-7 transition duration-300 ease-in-out focus:border focus:border-gray-400 focus:ring-2 focus:ring-gray-400' placeholder='Bio' />
+                                }} className='w-[80%] h-40 rounded-xl bg-[#f2f2f2] resize-none px-4 leading-7 transition duration-300 ease-in-out focus:border focus:border-gray-400 focus:ring-2 focus:ring-gray-400' placeholder='Bio' />
 
-                                <p className={`text-right -mt-4 md:mr-64 max-md:-ml-52 text-[12px] text-gray-400`}>{bioLen} / {bioLimit} Characters</p>
+                                <p className={`text-right -mt-4 md:mr-44 max-md:-ml-52 text-[12px] max-sm:pl-3 text-gray-400`}>{bioLen} / {bioLimit} Characters</p>
 
                                 <p className='text-xl font-semibold text-gray-500'>Your Socials</p>
 
-                                <div className='grid md:grid-cols-2 gap-5 w-[70%]'>
+                                <div className='grid md:grid-cols-2 gap-y-5 md:w-[89%] w-full max-md:justify-items-center'>
                                     {
                                         Object.keys(social_links).map((key, i) => {
                                             const link = social_links[key];
                                             const icons = iconsMap[key.toLowerCase()];
                                             return (
-                                                <InputBox wid='full' key={i} name={key} fromEditPage={true} value={link} type='text' placeholder='https://' icon={icons}
+                                                <InputBox wid='[80%]' key={i} name={key} fromEditPage={true} value={link} type='text' placeholder='https://' icon={icons}
                                                     onChange={(e) => {
                                                         setProfile(prevData => ({
                                                             ...prevData,

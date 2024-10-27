@@ -117,7 +117,7 @@ const Home = () => {
                         <div className="flex flex-col gap-5">
                             {
                                 !latestBlogs ?
-                                    <div className='flex md:ml-44 items-center mt-28'>
+                                    <div className='flex md:ml-44 ml-32 items-center mt-28'>
                                         {pageState === 'home' && <MutatingDots
                                             visible={true}
                                             height="100"

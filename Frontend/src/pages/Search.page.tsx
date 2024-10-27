@@ -106,7 +106,7 @@ const Search = () => {
                         <InPageNavigation routes={[`Search results for ${debounceval}`, "Accounts Matched"]} defaultHidden={["Accounts Matched"]} >
                             <div className="flex flex-col gap-5">
                                 {
-                                    !blogs ? <NoData message={`Type something to Search`} /> :
+                                    !blogs ? <div className="ml-10"><NoData message={`Type something to Search`} /></div> :
                                         <>
                                             {
                                                 !blogs.results.length ? <NoData message={`No Blogs yet`} /> :

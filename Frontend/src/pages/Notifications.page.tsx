@@ -67,7 +67,7 @@ const Notifications = () => {
             <div className='flex flex-col max-md:gap-16 md:gap-4 md:mx-8'>
 
                 <h1 className='max-md:hidden font-semibold text-xl text-gray-600 md:-mb-5'>Recent Notifications</h1>
-                <div className='max-md:mx-5 -my-8 md:my-8 flex gap-5'>
+                <div className='max-md:mx-3 -my-8 md:my-8 flex gap-5'>
                     {
                         filters.map((filtername, i) => {
                             return (
@@ -93,7 +93,7 @@ const Notifications = () => {
                                 wrapperClass=""
                             />
                         </div> :
-                            <div className='flex flex-col gap-2 md:w-[60%]'>{
+                            <div className='flex flex-col gap-2 md:w-[60%] w-full'>{
                                 notifications.results.length ?
                                     notifications.results.map((notification, i) => {
                                         return <PageAnimation key={i} transition={{ delay: i * 0.1 }}>

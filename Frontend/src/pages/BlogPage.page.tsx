@@ -192,7 +192,7 @@ const BlogPage = () => {
                                         </div>
                                     </div>
                                     <BlogInteractions />
-                                    <div className='mb-8 mt-3 max-md:px-2 font-gelasio flex flex-col gap-4 md:gap-8'>
+                                    <div className='mb-8 mt-3 max-md:px-3 font-gelasio flex flex-col gap-4 md:gap-8'>
                                         {
                                             content[0].blocks.map((block: object, i: number) => {
                                                 return <div key={i} className=''>

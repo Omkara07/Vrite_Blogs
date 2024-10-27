@@ -47,7 +47,7 @@ const NotificationCard: React.FC<props> = ({ notification, index }) => {
     useEffect(() => {
     }, [notifications.results[index]])
     return (
-        <div className={`flex flex-col gap-1 pt-3 hover:transf pb-8 px-4 max-md:mx-8 rounded-sm shadow-sm hover:shadow-lg transition-transform transform hover:scale-105 duration-300 text-gray-700 font-gelasio border-black ${!seen ? " border-l-4" : ""}`}>
+        <div className={`flex flex-col gap-1 pt-3 hover:transf pb-8 md:px-4 max-md:px-2 max-md:text-sm max-md:mx-2 rounded-sm shadow-sm hover:shadow-lg transition-transform transform hover:scale-105 duration-300 text-gray-700 font-gelasio border-black ${!seen ? " border-l-4" : ""}`}>
             <div className='flex gap-3'>
                 <img className='w-9 h-9 rounded-full' src={profile_img} alt="" />
                 <h1 className='flex text-lg gap-1'>

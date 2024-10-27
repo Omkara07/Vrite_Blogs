@@ -50,7 +50,7 @@ const ManageBlogCard: React.FC<prop> = ({ blog, index, stateFunc }) => {
             ])
     }
     return (
-        <div className='flex justify-between max-md:pb-6 border-gray-200 border-b pb-6 w-full hover:shadow-lg transition-transform transform hover:scale-105 duration-300 px-4'>
+        <div className='flex justify-between max-md:pb-6 border-gray-200 border-b pb-6 w-full hover:shadow-lg transition-transform transform hover:scale-105 duration-300 md:px-4'>
             <div className='flex flex-col justify-between gap-3 md:w-1/2'>
                 <div className='max-md:w-full md:w-80 aspect-video bg-gray-300 rounded-xl'>
                     <img src={banner} alt="blog banner" className='w-full h-full aspect-video rounded-xl object' />
