@@ -201,7 +201,7 @@ const BlogPage = () => {
                                             })
                                         }
                                     </div>
-                                    <div className="flex gap-5 ">
+                                    <div className="flex gap-5 max-md:gap-3 flex-wrap ">
                                         {
                                             tags.map((tag: string, i: number) => {
                                                 return <button key={i} className={`flex items-center gap-2 text-black bg-[#F2F2F2] focus:outline-none font-medium rounded-full text-[12px] px-5 py-2`}
