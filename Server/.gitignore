@@ -1,5 +1,5 @@
 dist
 .env
-node_modules
+node_modules/*
 
 blog-app-dd1ff-firebase-adminsdk-zulwp-181549e0ad.json
