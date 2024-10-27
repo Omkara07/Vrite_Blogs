@@ -11,8 +11,13 @@ app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none'); // Adjust as needed
     next();
 });
+const corsOptions = {
+    origin: 'https://vrite-five.vercel.app', // Allow requests only from your Vercel app
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Add other methods as needed
+    credentials: true // If your API requires credentials (cookies, HTTP auth)
+};
 app.use(express.json())
-app.use(cors())
+app.use(cors(corsOptions))
 
 ConnectDB();
 
