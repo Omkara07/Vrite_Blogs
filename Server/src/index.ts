@@ -7,8 +7,8 @@ const PORT = 5000
 
 // Middleware to set COOP headers
 app.use((req, res, next) => {
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-    res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin'); // Adjusting COOP
+    res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none'); // Adjust as needed
     next();
 });
 app.use(express.json())
