@@ -122,7 +122,7 @@ const ProfilePage = () => {
     return (
         <PageAnimation>
             {
-                loading ? <div className='flex md:ml-44 items-center mt-28'>
+                loading ? <div className='flex md:ml-44 ml-32 items-center mt-28'>
                     <MutatingDots
                         visible={true}
                         height="100"

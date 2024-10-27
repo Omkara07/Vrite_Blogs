@@ -181,7 +181,7 @@ const BlogEditor = memo(() => {
             </textarea>
             <hr className='w-ful my-5' />
 
-            <div id='textEditor' className='font-gelasio'></div>
+            <div id='textEditor' className='font-gelasio max-md:px-4'></div>
           </div>
         </section>
       </PageAnimation>
