@@ -112,7 +112,7 @@ const Home = () => {
             <div className="flex h-cover justify-between md:px-44 w-full gap-12 mb-10">
 
                 {/* latest blogs */}
-                <div className={`flex flex-col max-md:pr-4 md:w-2/3`}>
+                <div className={`flex flex-col md:w-2/3`}>
                     <InPageNavigation routes={[pageState, 'trending blogs']} defaultHidden={['trending blogs']} >
                         <div className="flex flex-col gap-5">
                             {
