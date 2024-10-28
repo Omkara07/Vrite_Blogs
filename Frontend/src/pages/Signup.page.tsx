@@ -98,24 +98,24 @@ const Signup = () => {
             <div>
                 <div className='flex flex-col w-full md:w-[40%] mx-auto justify-center items-center gap-6 mt-8  md:border border-gray-600 border-opacity-5 py-5 px-6 rounded-xl md:shadow-md'>
                     <h1 className='text-4xl font-bold mb-2'>Join Us Today</h1>
-                    <InputBox type="text" placeholder="Name" value={creds.fullname} name="fullname" icon="fi-rr-user" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    <InputBox type="text" placeholder="Name" wid='[80%]' value={creds.fullname} name="fullname" icon="fi-rr-user" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setCreds({ ...creds, fullname: e.target.value })
                     }} />
-                    <InputBox type="text" placeholder="Email" value={creds.email} name="email" icon="fi-rr-envelope" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    <InputBox type="text" placeholder="Email" wid='[80%]' value={creds.email} name="email" icon="fi-rr-envelope" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setCreds({ ...creds, email: e.target.value })
                     }} />
-                    <InputBox type="password" placeholder="Password" value={creds.password} name="password" icon="fi-rr-key" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    <InputBox type="password" placeholder="Password" wid='[80%]' value={creds.password} name="password" icon="fi-rr-key" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setCreds({ ...creds, password: e.target.value })
                     }} />
-                    <BlackBtn value='Create' onClick={handleSubmit} />
-                    <div className='flex gap-1 text-gray-400 w-3/4 items-center'>
+                    <BlackBtn value='Create' wid='[80%]' onClick={handleSubmit} />
+                    <div className='flex gap-1 text-gray-400 w-full items-center'>
                         <hr className='flex w-1/2 ' />
                         <p className='flex'>OR</p>
                         <hr className='flex w-1/2 ' />
                     </div>
                     <div className='flex w-full justify-center items-center -translate-x-5 gap-1 md:gap-0'>
-                        <FcGoogle className='relative translate-x-24 text-xl w-10 z-30 ' />
-                        <BlackBtn value="Continue with Google" onClick={handleGoogleAuth} />
+                        <FcGoogle className='max-md:translate-x-14 relative translate-x-24 text-xl w-10 z-30 ' />
+                        <BlackBtn value="Continue with Google" wid='[80%]' onClick={handleGoogleAuth} />
                     </div>
                     <div className='text-gray-500'>Already a User ? <Link to='/signin' className='underline text-black'>Login here</Link></div>
                 </div>

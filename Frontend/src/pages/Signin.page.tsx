@@ -94,21 +94,21 @@ const Signin = () => {
             <Toaster richColors />
             <div className='flex flex-col w-full md:w-[40%] mx-auto justify-center items-center gap-6 mt-8 md:mt-10 md:border border-gray-600 border-opacity-5 py-10 px-6 rounded-xl md:shadow-md'>
                 <h1 className='text-4xl font-bold mb-10'>Welcome Back</h1>
-                <InputBox type="text" placeholder="Email" value={creds.email} name="email" icon="fi-rr-envelope" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                <InputBox type="text" placeholder="Email" wid='[80%]' value={creds.email} name="email" icon="fi-rr-envelope" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setCreds({ ...creds, email: e.target.value })
                 }} />
-                <InputBox type="password" placeholder="Password" value={creds.password} name="password" icon="fi-rr-key" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                <InputBox type="password" placeholder="Password" wid='[80%]' value={creds.password} name="password" icon="fi-rr-key" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setCreds({ ...creds, password: e.target.value })
                 }} />
-                <BlackBtn value='Login' onClick={handleSubmit} />
-                <div className='flex gap-1 text-gray-400 w-3/4 items-center'>
+                <BlackBtn value='Login' wid='[80%]' onClick={handleSubmit} />
+                <div className='flex gap-1 text-gray-400 w-full items-center'>
                     <hr className='flex w-1/2 ' />
                     <p className='flex'>OR</p>
                     <hr className='flex w-1/2 ' />
                 </div>
                 <div className='flex w-full justify-center items-center -translate-x-5 gap-1 md:gap-0'>
-                    <FcGoogle className='max-md:translate-x-12 relative translate-x-24 text-xl w-10 z-30 ' />
-                    <BlackBtn value="Continue with Google" onClick={handleGoogleAuth} />
+                    <FcGoogle className='max-md:translate-x-14 relative translate-x-24 text-xl w-10 z-30 ' />
+                    <BlackBtn value="Continue with Google" wid='[80%]' onClick={handleGoogleAuth} />
                 </div>
                 <div className='text-gray-500'>Don't have an account ? <Link to='/signup' className='underline text-black'>Create Account</Link></div>
             </div>
