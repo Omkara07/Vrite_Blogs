@@ -160,7 +160,7 @@ const EditProfile = () => {
                             <button className='px-4 py-2 rounded-full max-lg:center w-32 hover:bg-gray-700 bg-black text-white font-semibold' onClick={handleImgUpload}>Upload</button>
                         </div>
                         <div className='flex flex-col w-full gap-5'>
-                            <div className='flex max-md:flex-col gap-5 md:w-[70%] w-full items-center'>
+                            <div className='flex max-md:flex-col gap-5 md:w-[80%] w-full items-center'>
                                 <InputBox type='text' value={fullname} wid='[80%]' name='fullname' placeholder='fullname' disabled={true} icon='fi-rr-user' />
                                 <InputBox type='text' value={email} wid='[80%]' name='email' placeholder='email' disabled={true} icon='fi-rr-envelope' />
                             </div>
