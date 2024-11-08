@@ -6,7 +6,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyCVPtOzK_hTmOADGMKfato2W5tRfVphd9w",
+    apiKey: import.meta.env.VITE_firebase_apikey,
     authDomain: "blog-app-dd1ff.firebaseapp.com",
     projectId: "blog-app-dd1ff",
     storageBucket: "blog-app-dd1ff.appspot.com",
