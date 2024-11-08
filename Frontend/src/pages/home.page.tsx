@@ -218,7 +218,7 @@ const Home = () => {
                                             )
                                         })
                             }
-                            <Link to='/trending-blogs' className="text-emerald-500 font-gelasio text-sm mt-8 font-semibold">See full list </Link>
+                            {/* <Link to='/trending-blogs' className="text-emerald-500 font-gelasio text-sm mt-8 font-semibold">See full list </Link> */}
                         </div>
                     </div>
                 </div>
