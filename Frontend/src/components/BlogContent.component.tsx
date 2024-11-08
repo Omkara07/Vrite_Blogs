@@ -107,11 +107,11 @@ const Quote: React.FC<any> = ({ quote, caption }) => {
     };
     return (
         <div className={`flex flex-col items-center border-l-4  border-purple-500 ${isActive ? 'animate-gradient-text' : 'bg-purple-100'} py-10 md:mx-10 max-md:px-5 leading-8`} onClick={handleClick}>
-            <p className='italic font-medium'>
-                {quote.split("—")[0]}
+            <p className='italic font-medium' dangerouslySetInnerHTML={{ __html: quote.split("—")[0] }}>
+
             </p>
-            <p className='italic font-medium text-gray-700'>
-                {"-" + quote.split("—")[1]}
+            <p className='italic font-medium text-gray-700' dangerouslySetInnerHTML={{ __html: "-" + quote.split("—")[1] }}>
+
             </p>
             {caption && <p className='font-extralight text-gray-500 mt-4'><i>{caption}</i></p>}
         </div>
