@@ -38,10 +38,10 @@ app.listen(PORT, () => {
     const backendURL = process.env.SERVER_URL || `http://localhost:${PORT}`;
     axios
         .get(`${backendURL}/prewarm`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Prewarm successful:', response.status, response.data);
         })
-        .catch((error) => {
+        .catch((error: any) => {
             console.error('Error during prewarm:', error.message);
         });
 });

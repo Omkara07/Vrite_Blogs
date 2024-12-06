@@ -22,6 +22,7 @@
     "@types/nanoid": "^2.1.0",
     "@types/typescript": "^0.4.29",
     "aws-sdk": "^2.1691.0",
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
