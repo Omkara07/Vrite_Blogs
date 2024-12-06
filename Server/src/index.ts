@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import cors from 'cors'
 import mainRouter from './routes/index'
 import { ConnectDB } from './db'
+import axios from 'axios'
 const app = express()
 const PORT = 5000
 
@@ -24,4 +25,23 @@ ConnectDB();
 app.use('/api/v1', mainRouter)
 
 
-app.listen(PORT, () => console.log("App is listening to " + PORT))
+// app.listen(PORT, () => console.log("App is listening to " + PORT))
+
+// Prewarm Route
+app.get('/prewarm', (req: Request, res: Response) => {
+    res.status(200).json({ message: 'Prewarm successful' });
+});
+app.listen(PORT, () => {
+    console.log(`App is listening on port ${PORT}`);
+
+    // Prewarm the server
+    const backendURL = process.env.SERVER_URL || `http://localhost:${PORT}`;
+    axios
+        .get(`${backendURL}/prewarm`)
+        .then((response) => {
+            console.log('Prewarm successful:', response.status, response.data);
+        })
+        .catch((error) => {
+            console.error('Error during prewarm:', error.message);
+        });
+});
