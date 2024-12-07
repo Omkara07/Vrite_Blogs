@@ -28,7 +28,7 @@ const Search = () => {
     const [users, setUsers] = useState<usersType[] | null>(null)
     const [loading, setLoading] = useState(false);
     const { userAuth: { token }, filter } = useContext(AuthContext)
-    const debounceval = useDebounce(filter)
+    const debounceval = useDebounce(filter.toLowerCase())
 
     const loadBlogs = async ({ page = 1, create_new_arr = false }) => {
         try {
