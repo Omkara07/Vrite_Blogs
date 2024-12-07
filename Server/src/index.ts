@@ -27,21 +27,26 @@ app.use('/api/v1', mainRouter)
 
 // app.listen(PORT, () => console.log("App is listening to " + PORT))
 
-// Prewarm Route
-app.get('/prewarm', (req: Request, res: Response) => {
-    res.status(200).json({ message: 'Prewarm successful' });
+// Health check route for the self-call
+app.get("/self-call", (req: Request, res: Response) => {
+    console.log("Self-call received at", new Date().toISOString());
+    res.status(200).send("Server is alive!");
 });
-app.listen(PORT, () => {
-    console.log(`App is listening on port ${PORT}`);
 
-    // Prewarm the server
-    const backendURL = process.env.SERVER_URL || `http://localhost:${PORT}`;
-    axios
-        .get(`${backendURL}/prewarm`)
-        .then((response: any) => {
-            console.log('Prewarm successful:', response.status, response.data);
-        })
-        .catch((error: any) => {
-            console.error('Error during prewarm:', error.message);
-        });
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running`);
+
+    // Set up a periodic self-call every 20 seconds
+    const SELF_CALL_INTERVAL = 20 * 1000; // 20 seconds
+    const SELF_URL = process.env.SERVER_URL || `http://localhost:${PORT}/self-call`;
+
+    setInterval(async () => {
+        try {
+            console.log("Making self-call...");
+            await axios.get(SELF_URL);
+        } catch (error: any) {
+            console.error("Error during self-call:", error.message);
+        }
+    }, SELF_CALL_INTERVAL);
 });
