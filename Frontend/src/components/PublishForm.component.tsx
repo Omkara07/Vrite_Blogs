@@ -71,7 +71,6 @@ const PublishForm = () => {
         }
 
         const blog = { ...blogCreds, draft: false }
-        console.log(blog)
 
         const blogToast = toast.loading("Publishing...")
         axios.post(import.meta.env.VITE_server_url + '/user/create-blog',

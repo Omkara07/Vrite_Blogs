@@ -29,7 +29,6 @@ export const filterPaginationData = async ({ create_new_arr = false, data_to_sen
             }
         })
             .then(({ data: { totalDocs } }) => {
-                console.log(totalDocs)
                 obj = { results: data, page: 1, totalBlogs: totalDocs }
             })
             .catch(err => {

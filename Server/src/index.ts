@@ -29,7 +29,6 @@ app.use('/api/v1', mainRouter)
 
 // Health check route for the self-call
 app.get("/self-call", (req: Request, res: Response) => {
-    console.log("Self-call received at", new Date().toISOString());
     res.status(200).send("Server is alive!");
 });
 
@@ -43,7 +42,6 @@ app.listen(PORT, () => {
 
     setInterval(async () => {
         try {
-            console.log("Making self-call...");
             await axios.get(SELF_URL);
         } catch (error: any) {
             console.error("Error during self-call:", error.message);

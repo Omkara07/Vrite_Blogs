@@ -536,7 +536,6 @@ router.post("/is-blog-liked", GetUserMiddleware, (req: Request, res: Response) =
 
 router.post("/add-comment", GetUserMiddleware, async (req: Request, res: Response) => {
     let { blog_id, comment, replying_to, id, notification_id } = req.body
-    console.log(replying_to)
 
     if (!comment.length) {
         return res.status(500).json({ message: "Can't post an empty comment" })
@@ -565,7 +564,6 @@ router.post("/add-comment", GetUserMiddleware, async (req: Request, res: Respons
                 }
                 Comment.create(commentObj)
                     .then(async (commentFile) => {
-                        console.log(commentFile)
                         Blog.findOneAndUpdate({ blog_id },
                             {
                                 $push: { "comments": commentFile._id },
@@ -696,10 +694,8 @@ const deleteComment = async (_id: Types.ObjectId) => {
 }
 router.post('/delete-comment', GetUserMiddleware, (req: Request, res: Response) => {
     const { id, _id } = req.body
-    console.log(id, _id)
     Comment.findOne({ _id })
         .then(async (comment) => {
-            console.log(comment)
             if (id == comment?.commented_by || id == comment?.blog_author) {
                 await deleteComment(_id)
                 return res.json({ success: true, message: "Deleted successfully" })
@@ -775,7 +771,6 @@ router.post("/update-profile", GetUserMiddleware, (req: Request, res: Response) 
         for (let i = 0; i < socialLinksArr.length; i++) {
             if (social_links[socialLinksArr[i]].length) {
                 let hostname = new URL(social_links[socialLinksArr[i]]).hostname;
-                console.log(hostname)
                 if ((!hostname.includes(`${socialLinksArr[i]}.com`) && socialLinksArr[i] != 'twitter') && socialLinksArr[i] !== 'website') {
                     return res.status(403).json({ message: `Invalid ${socialLinksArr[i]} link`, success: false });
                 }

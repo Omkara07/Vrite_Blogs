@@ -60,8 +60,6 @@ const Signup = () => {
         e.preventDefault()
         authWithGoogle().then(async (user: any) => {
             const access_token = user.accessToken
-            console.log(access_token)
-            console.log(user)
             try {
                 // Make the API call to the server
                 const res = await axios.post(`${Server_url}/user/googleAuth`, {
@@ -75,7 +73,6 @@ const Signup = () => {
                         'Cross-Origin-Embedder-Policy': 'unsafe-none'
                     }
                 });
-                console.log(res.data)
                 if (res.data.success) {
                     localStorage.setItem("userAuth", JSON.stringify(res.data.user))
                     setUserAuth(res.data.user)

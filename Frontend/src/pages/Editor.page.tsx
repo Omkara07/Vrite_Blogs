@@ -34,7 +34,6 @@ const Editor = memo(() => {
     const [textEditor, setTextEditor] = useState({ isReady: false })
 
     useEffect(() => {
-        // console.log(userAuth)
         const userLogged = localStorage.getItem("userAuth")
         if (!userLogged) {
             toast.error("You are not logged in")
@@ -50,7 +49,6 @@ const Editor = memo(() => {
         })
             .then(({ data }) => {
                 setBlogCreds(data.blog)
-                console.log(blogCreds)
                 setLoading(false)
             })
             .catch((e) => {
@@ -58,7 +56,6 @@ const Editor = memo(() => {
                 setLoading(false)
             })
     }, [])
-    // console.log(userAuth)
     return (
         <BlogContext.Provider value={{ blogCreds, setBlogCreds, editorState, setEditorState, textEditor, setTextEditor }}>
             <>

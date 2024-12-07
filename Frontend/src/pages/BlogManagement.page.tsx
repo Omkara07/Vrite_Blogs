@@ -25,7 +25,6 @@ const BlogManagement = () => {
     const { userAuth: { token } } = useContext(AuthContext)
     const debounceVal = useDebounce(query)
     const activeNavTab = useSearchParams()[0].get("tag")
-    console.log(activeNavTab)
     const getBlogs = ({ page, draft = false, deletedDocs = 0 }: { page: number, draft?: boolean, deletedDocs?: number }) => {
         axios.post(import.meta.env.VITE_server_url + '/user/written-blogs', {
             page,
@@ -46,7 +45,6 @@ const BlogManagement = () => {
                     data_to_send: { draft, query: debounceVal },
                     counteRoute: '/user/written-blogs-count'
                 })
-                console.log("draft:", draft, formattedData)
                 if (draft) {
                     setDrafts(formattedData)
                 }

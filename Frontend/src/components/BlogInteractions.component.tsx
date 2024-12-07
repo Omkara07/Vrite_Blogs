@@ -35,7 +35,6 @@ const BlogInteractions = () => {
                 }
             })
                 .then(({ data }) => {
-                    console.log(data.message)
                 })
         }
         else {

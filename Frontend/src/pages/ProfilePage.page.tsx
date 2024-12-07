@@ -101,7 +101,6 @@ const ProfilePage = () => {
             console.log(e)
         }
     }
-    console.log(blogs)
 
     const resetState = () => {
         setBlogs(null)

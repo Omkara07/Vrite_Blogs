@@ -41,7 +41,6 @@ const EditProfile = () => {
             })
                 .then(async ({ data }) => {
                     setProfile(data)
-                    console.log(data)
                     setLoading(false)
                 })
         }
@@ -60,7 +59,6 @@ const EditProfile = () => {
         const eve = e.target as HTMLButtonElement
         const loadingToast = toast.loading("Uploading")
         eve.setAttribute("disabled", "true")
-        console.log(updatedImg)
         if (updatedImg) {
 
             uploadImage({ img: updatedImg })
@@ -84,7 +82,6 @@ const EditProfile = () => {
                             .catch(({ response }) => {
                                 toast.dismiss(loadingToast);
                                 eve.removeAttribute("disabled")
-                                console.log(response)
                                 toast.error(response.data.message)
                             })
                     }

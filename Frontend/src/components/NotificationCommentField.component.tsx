@@ -35,7 +35,6 @@ const NotificationCommentField: React.FC<props> = ({ _id, blog_author, index, se
                 updatedRes[index].reply = { comment, _id: data.comment._id }
                 await setNotifications({ ...notifications, results: updatedRes })
                 setIsReplying(false)
-                console.log(data)
             })
             .catch((e) => {
                 console.log(e)

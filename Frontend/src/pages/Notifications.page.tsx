@@ -33,7 +33,6 @@ const Notifications = () => {
             }
         })
             .then(async ({ data: { notifications: data } }) => {
-                console.log(data)
                 const formatedData = await filterPaginationData({
                     state: notifications,
                     data,
@@ -42,7 +41,6 @@ const Notifications = () => {
                     page,
                     data_to_send: { filter }
                 })
-                console.log(formatedData)
                 setUserAuth({ ...userAuth, new_notifications: false })
                 setNotifications({ ...formatedData, deletedDocs })
             })

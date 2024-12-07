@@ -37,7 +37,6 @@ const Navbar = () => {
                 }
             })
                 .then(({ data }) => {
-                    console.log(data)
                     setUserAuth({ ...userAuth, new_notifications: data.new_notifications })
                 })
                 .catch((e) => {
@@ -81,7 +80,6 @@ const Navbar = () => {
                                 // this will prevent the userNav panel from closing on the clicks inside of the panel
                                 onMouseDown={handleOnMouseDown}>
                                 <button className='flex w-8 h-8  border-black border-2 rounded-full md:mr-2' onClick={() => {
-                                    // console.log(userAuth.profile_img)
                                     setUserNav(prev => !prev)
                                 }}>
                                     <img src={userAuth.profile_img} className='rounded-full h-full w-full' />

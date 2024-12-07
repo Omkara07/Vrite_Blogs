@@ -24,7 +24,6 @@ const NotificationCard: React.FC<props> = ({ notification, index }) => {
         setIsReplying(!isReplying)
     }
     const handleDelete = async ({ commentId, type, target }: { commentId: string, type: string, target: HTMLButtonElement }) => {
-        console.log(target)
         target.setAttribute("disabled", "true");
         try {
             await axios.post(`${import.meta.env.VITE_server_url}/user/delete-comment`, { _id: commentId }, {

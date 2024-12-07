@@ -51,7 +51,6 @@ const BlogEditor = memo(() => {
         toast.error(e.message)
       }
     }
-    console.log(img)
   }
 
   //  this will prevent the use of enter key inside the title 
@@ -73,7 +72,6 @@ const BlogEditor = memo(() => {
 
   const handlePublishBlog = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    // console.log(!blogCreds.banner.length)
     if (!blogCreds.banner.length) {
       return toast.error("Can't publish blog without a Banner")
     }
@@ -82,7 +80,6 @@ const BlogEditor = memo(() => {
     }
     if (textEditor.isReady) {
       textEditor.save().then((data: any) => {
-        console.log(data)
         if (data.blocks.length) {
           setBlogCreds({ ...blogCreds, content: data })
           setEditorState("publish")
@@ -112,7 +109,6 @@ const BlogEditor = memo(() => {
           setBlogCreds({ ...blogCreds, content: data })
         }
         const blog = { ...blogCreds, draft: true }
-        console.log(blog)
 
         const blogToast = toast.loading("Saving Draft...")
         axios.post(import.meta.env.VITE_server_url + '/user/create-blog',

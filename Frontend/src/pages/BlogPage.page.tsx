@@ -111,7 +111,6 @@ const BlogPage = () => {
                 const fetchedComments = await fetchComments({ blog_id: res.data.blog?.blog_id, setParentCommentFun: setTotalParentComments })
                 res.data.blog.comments = fetchedComments
                 setBlog(res.data.blog)
-                // console.log(res.data.blog)
                 await fetchSimilarBlogs(res.data.blog.tags)
                 setLoading(false)
             })

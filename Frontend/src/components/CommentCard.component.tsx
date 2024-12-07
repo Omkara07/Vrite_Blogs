@@ -86,7 +86,6 @@ const CommentCard: React.FC<props> = ({ index, leftLev, commentData }) => {
                         replies[i].childrenLevel = commentArr[curIndex].childrenLevel + 1;
                         commentArr.splice(curIndex + 1 + i + skip, 0, replies[i])
                     }
-                    console.log(commentArr)
                     setBlog({ ...blog, comments: { ...comments, results: commentArr } })
                 })
                 .catch(e => {
