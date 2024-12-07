@@ -12,7 +12,6 @@ type props = {
     setReplying?: any
 }
 const CommentField: React.FC<props> = ({ action, index, replying_to, setReplying }) => {
-    console.log(replying_to)
     const [comment, setComment] = useState<string>("")
     const { userAuth: { token, username, profile_img } } = useContext(AuthContext)
     // @ts-ignore
@@ -34,15 +33,12 @@ const CommentField: React.FC<props> = ({ action, index, replying_to, setReplying
             }
         })
             .then(({ data }) => {
-                console.log(data.comment)
                 setComment("")
                 data.comment.commented_by = { personal_info: { username, profile_img } }
 
                 let newCommentArr;
 
-                console.log(replying_to, index)
                 if (replying_to && index != undefined) {
-                    // console.log(commentArr[index])
                     commentArr[index].children.push(data.comment._id)
 
                     data.comment.childrenLevel = commentArr[index].childrenLevel + 1;
