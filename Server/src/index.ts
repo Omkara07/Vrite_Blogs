@@ -36,8 +36,8 @@ app.get("/self-call", (req: Request, res: Response) => {
 app.listen(PORT, () => {
     console.log(`Server is running`);
 
-    // Set up a periodic self-call every 20 seconds
-    const SELF_CALL_INTERVAL = 20 * 1000; // 20 seconds
+    // Set up a periodic self-call every 14 minutes
+    const SELF_CALL_INTERVAL = 840000; // 14 minutes
     const SELF_URL = process.env.SERVER_URL || `http://localhost:${PORT}/self-call`;
 
     setInterval(async () => {
